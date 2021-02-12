@@ -1,0 +1,22 @@
+﻿<Window x:Class="BetterClicker.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:BetterClicker"
+        mc:Ignorable="d"
+        ResizeMode="CanResize"
+        AllowsTransparency="False"
+        Title="Better clicker" Height="600" Width="1163.5">
+    <Grid x:Name="mainGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="119*"/>
+            <ColumnDefinition Width="873*"/>
+        </Grid.ColumnDefinitions>
+        <Menu x:Name="mainMenu" Margin="0,1,0,0">
+            <Button x:Name="tasksViewButton" Content="Tasks" Width="125" Click="tasksViewButton_Click"/>
+            <Button x:Name="settingsViewButton" Content="Settings" Width="125" Click="settingsViewButton_Click"/>
+        </Menu>
+        <ContentControl x:Name="viewBox" Margin="1,1,0,-1" Grid.Column="1"/>
+    </Grid>
+</Window>

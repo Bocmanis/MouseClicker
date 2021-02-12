@@ -1,0 +1,23 @@
+﻿<UserControl x:Class="BetterClicker.Controls.SettingsUserControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:BetterClicker.Controls"
+             mc:Ignorable="d" 
+             d:DesignHeight="516" d:DesignWidth="1016" Initialized="UserControl_Initialized" Background="#FFE8E8E8" BorderBrush="#FF444444">
+    <Grid KeyDown="Grid_KeyDown">
+        <Label x:Name="settingsLabel" Content="Settings" HorizontalAlignment="Left" Margin="12,2,0,0" VerticalAlignment="Top" Width="130"/>
+        <Label Content="Double Click Delay" HorizontalAlignment="Left" Margin="25,39,0,0" VerticalAlignment="Top" Width="135"/>
+        <TextBox x:Name="doubleClickTextBox" HorizontalAlignment="Left" Height="23" Margin="177,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="doubleClickTextBox_LostFocus"/>
+        <Label x:Name="___No_Name_" Content="LeftTopInventory" HorizontalAlignment="Left" Margin="26,75,0,0" VerticalAlignment="Top" Width="131"/>
+        <TextBox x:Name="leftTopInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="177,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Label Content="Right bottom inventory" HorizontalAlignment="Left" Margin="25,109,0,0" VerticalAlignment="Top" Width="145"/>
+        <TextBox x:Name="rightBottomInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="177,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Button x:Name="readInventoryButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="324,77,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readInventoryButton_Click" />
+        <Label Content="Inventory precision modifier" HorizontalAlignment="Left" Margin="25,146,0,0" VerticalAlignment="Top" Width="135"/>
+        <TextBox x:Name="inventoryPrecisionModifierTextBox" HorizontalAlignment="Left" Height="22" Margin="177,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
+        <Button x:Name="doScreenshotButton" Content="Do screenshots" HorizontalAlignment="Left" Margin="76,204,0,0" VerticalAlignment="Top" Width="118" Click="doScreenshotButton_Click"/>
+
+    </Grid>
+</UserControl>
