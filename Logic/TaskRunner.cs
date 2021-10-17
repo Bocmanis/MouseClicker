@@ -19,6 +19,7 @@ namespace BetterClicker.Logic
             this.InputSimulator = new InputSimulator();
             this.Random = new Random(DateTime.Now.Millisecond);
             this.MouseActionIncreaser = new Dictionary<MouseActionModel, int>();
+            this.ImageProcessor = new ImageProcessingLogic();
         }
 
         public EventHandler OnInfoChanged;
@@ -27,6 +28,7 @@ namespace BetterClicker.Logic
         public bool DoStop { get; internal set; }
         public InputSimulator InputSimulator { get; private set; }
         public Dictionary<MouseActionModel,int> MouseActionIncreaser { get; private set; }
+        public ImageProcessingLogic ImageProcessor { get; private set; }
         public OverTask CurrentOverTask { get; private set; }
         public FullTask CurrentFullTask { get; private set; }
         public string FullTaskRepeatText { get; private set; }
@@ -40,8 +42,8 @@ namespace BetterClicker.Logic
             {
                 Thread.Sleep(3000);
                 this.OverTaskCounter = 1;
+                ImageProcessor.SetCondition();
                 DoOverTask(overTask);
-
             }
             finally
             {
@@ -137,6 +139,13 @@ namespace BetterClicker.Logic
 
         private void DoClick(MouseActionModel task)
         {
+            if (task.CheckCondition)
+            {
+                if (ImageProcessor.IsConditionMet())
+                {
+                    return;
+                }
+            }
             switch (task.ActionType)
             {
                 case ActionType.RightClick:
@@ -154,8 +163,11 @@ namespace BetterClicker.Logic
                     break;
                 case ActionType.DrinkAllPot:
                     MouseActions.DoQuadLeftClick(GetPoint(task));
-
                     break;
+                case ActionType.ClickColBox:
+                    MouseActions.DoLeftClick(ImageProcessor.GetColouredBoxPoint());
+                    break;
+                case ActionType.None:
                 default:
                     break;
             }

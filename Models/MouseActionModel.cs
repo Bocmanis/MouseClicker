@@ -34,5 +34,8 @@ namespace BetterClicker.Models
         public int RepTimes { get; set; }
         public KeyPresses ClickKey { get; set; }
 
+        [DisplayName("Con")]
+        public bool CheckCondition { get; set; }
+
     }
 }

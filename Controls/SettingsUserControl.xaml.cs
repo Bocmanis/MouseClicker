@@ -26,12 +26,16 @@ namespace BetterClicker.Controls
     public partial class SettingsUserControl : UserControl
     {
         public bool InventoryPointReadActive { get; private set; }
+        public bool ConditionPointReadActive { get; private set; }
+        public bool CenterOfScreenPointReadActive { get; private set; }
+
+
         public SettingsModel Settings { get; private set; }
 
         public SettingsUserControl()
         {
+
             InitializeComponent();
-            
             if (MainWindow.AppModel.Settings == null)
             {
                 MainWindow.AppModel.Settings = new SettingsModel();
@@ -43,13 +47,27 @@ namespace BetterClicker.Controls
             }
             this.doubleClickTextBox.Text = Settings.DoubleClickDelayMs?.ToString();
             this.inventoryPrecisionModifierTextBox.Text = Settings.InventoryPrecisionModifier?.ToString();
+            this.minBlobSizeTextBox.Text = Settings.MinBlobSize?.ToString();
+            this.agilityModeCheckBox.IsChecked = Settings.AgilityMode;
+
             SetInventoryPointTexts();
+            SetConditionPointTexts();
+            SetCenterOfScreenPointTexts();
         }
 
         private void SetInventoryPointTexts()
         {
             this.rightBottomInventoryTextBox.Text = MakeCoordinateString(Settings.InventoryRightBottom);
             this.leftTopInventoryTextBox.Text = MakeCoordinateString(Settings.InventoryLeftTop);
+        }
+        private void SetConditionPointTexts()
+        {
+            this.rightBottomConditionTextBox.Text = MakeCoordinateString(Settings.ConditionLeftTop);
+            this.leftTopConditionTextBox.Text = MakeCoordinateString(Settings.ConditionRightBottom);
+        }
+        private void SetCenterOfScreenPointTexts()
+        {
+            this.centerOfScreenTextBox_Copy.Text = MakeCoordinateString(Settings.ScreenCenter);
         }
 
         private string MakeCoordinateString(Models.Point point)
@@ -81,20 +99,38 @@ namespace BetterClicker.Controls
 
         private async void Grid_KeyDown(object sender, KeyEventArgs e)
         {
-            if (this.InventoryPointReadActive)
+            if (e.Key == Key.C)
             {
-                if (e.Key == Key.C)
+                if (this.InventoryPointReadActive)
                 {
                     Settings.InventoryLeftTop = MouseActions.GetMousePosition();
                     SetInventoryPointTexts();
                 }
-                if (e.Key == Key.V)
+                if (this.ConditionPointReadActive)
+                {
+                    Settings.ConditionLeftTop = MouseActions.GetMousePosition();
+                    SetConditionPointTexts();
+                }
+                if (this.CenterOfScreenPointReadActive)
+                {
+                    Settings.ScreenCenter = MouseActions.GetMousePosition();
+                    SetCenterOfScreenPointTexts();
+                }
+            }
+            if (e.Key == Key.V)
+            {
+                if (this.InventoryPointReadActive)
                 {
                     Settings.InventoryRightBottom = MouseActions.GetMousePosition();
                     SetInventoryPointTexts();
                 }
-                await SaveFile();
+                if (this.ConditionPointReadActive)
+                {
+                    Settings.ConditionRightBottom = MouseActions.GetMousePosition();
+                    SetConditionPointTexts();
+                }
             }
+            await SaveFile();
         }
 
         private string FilePath = "saveFile.json";
@@ -127,10 +163,45 @@ namespace BetterClicker.Controls
             }
         }
 
-        private void doScreenshotButton_Click(object sender, RoutedEventArgs e)
+        private void setCenterOfScreenButton_Click(object sender, RoutedEventArgs e)
         {
-            var point = new ImageProcessingLogic().Test();
-            MouseActions.DoLeftClick(point);
+            this.CenterOfScreenPointReadActive = !CenterOfScreenPointReadActive;
+            if (CenterOfScreenPointReadActive)
+            {
+                setCenterOfScreenButton_Copy.Background = Brushes.Green;
+            }
+            else
+            {
+                setCenterOfScreenButton_Copy.Background = Brushes.Gray;
+            }
+        }  
+
+        private void readConditionButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.ConditionPointReadActive = !ConditionPointReadActive;
+            if (ConditionPointReadActive)
+            {
+                readConditionButton.Background = Brushes.Green;
+            }
+            else
+            {
+                readConditionButton.Background = Brushes.Gray;
+            }
+        }
+
+        private async void minBlobSizeTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(minBlobSizeTextBox.Text, out int inventoryPrecision))
+            {
+                Settings.MinBlobSize = inventoryPrecision;
+                await SaveFile();
+            }
+        }
+
+        private async void agilityModeCheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            Settings.AgilityMode = agilityModeCheckBox.IsChecked ?? false;
+            await SaveFile();
         }
     }
 }

@@ -9,15 +9,29 @@
     <Grid KeyDown="Grid_KeyDown">
         <Label x:Name="settingsLabel" Content="Settings" HorizontalAlignment="Left" Margin="12,2,0,0" VerticalAlignment="Top" Width="130"/>
         <Label Content="Double Click Delay" HorizontalAlignment="Left" Margin="25,39,0,0" VerticalAlignment="Top" Width="135"/>
-        <TextBox x:Name="doubleClickTextBox" HorizontalAlignment="Left" Height="23" Margin="177,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="doubleClickTextBox_LostFocus"/>
+        <TextBox x:Name="doubleClickTextBox" HorizontalAlignment="Left" Height="23" Margin="199,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="doubleClickTextBox_LostFocus"/>
         <Label x:Name="___No_Name_" Content="LeftTopInventory" HorizontalAlignment="Left" Margin="26,75,0,0" VerticalAlignment="Top" Width="131"/>
-        <TextBox x:Name="leftTopInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="177,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <TextBox x:Name="leftTopInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="199,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
         <Label Content="Right bottom inventory" HorizontalAlignment="Left" Margin="25,109,0,0" VerticalAlignment="Top" Width="145"/>
-        <TextBox x:Name="rightBottomInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="177,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Button x:Name="readInventoryButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="324,77,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readInventoryButton_Click" />
-        <Label Content="Inventory precision modifier" HorizontalAlignment="Left" Margin="25,146,0,0" VerticalAlignment="Top" Width="135"/>
-        <TextBox x:Name="inventoryPrecisionModifierTextBox" HorizontalAlignment="Left" Height="22" Margin="177,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
-        <Button x:Name="doScreenshotButton" Content="Do screenshots" HorizontalAlignment="Left" Margin="76,204,0,0" VerticalAlignment="Top" Width="118" Click="doScreenshotButton_Click"/>
+        <TextBox x:Name="rightBottomInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="199,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Button x:Name="readInventoryButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="346,77,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readInventoryButton_Click" />
+        <Label Content="Inventory precision modifier" HorizontalAlignment="Left" Margin="25,146,0,0" VerticalAlignment="Top" Width="163"/>
+        <TextBox x:Name="inventoryPrecisionModifierTextBox" HorizontalAlignment="Left" Height="22" Margin="199,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
+        <Label Content="Center of screen" HorizontalAlignment="Left" Margin="27,180,0,0" VerticalAlignment="Top" Width="163"/>
+        <TextBox x:Name="centerOfScreenTextBox" HorizontalAlignment="Left" Height="22" Margin="201,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
+        <Button x:Name="setCenterOfScreenButton" Content="Set" HorizontalAlignment="Left" Margin="345,184,0,0" VerticalAlignment="Top" Width="55" Height="18" Click="setCenterOfScreenButton_Click" />
+        <Label Content="Center of screen" HorizontalAlignment="Left" Margin="27,180,0,0" VerticalAlignment="Top" Width="163"/>
+        <TextBox x:Name="centerOfScreenTextBox_Copy" HorizontalAlignment="Left" Height="22" Margin="201,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
+        <Button x:Name="setCenterOfScreenButton_Copy" Content="Set" HorizontalAlignment="Left" Margin="345,184,0,0" VerticalAlignment="Top" Width="55" Height="18" Click="setCenterOfScreenButton_Click" />
+        <Label x:Name="___No_Name__Copy" Content="ConditionLeftTop" HorizontalAlignment="Left" Margin="25,220,0,0" VerticalAlignment="Top" Width="131"/>
+        <TextBox x:Name="leftTopConditionTextBox" HorizontalAlignment="Left" Height="23" Margin="198,222,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Label Content="ConditionRightBottom" HorizontalAlignment="Left" Margin="24,254,0,0" VerticalAlignment="Top" Width="145"/>
+        <TextBox x:Name="rightBottomConditionTextBox" HorizontalAlignment="Left" Height="23" Margin="198,256,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Button x:Name="readConditionButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="345,222,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readConditionButton_Click" />
+        <Label Content="Min blob size" HorizontalAlignment="Left" Margin="25,290,0,0" VerticalAlignment="Top" Width="163"/>
+        <TextBox x:Name="minBlobSizeTextBox" HorizontalAlignment="Left" Height="22" Margin="197,290,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="minBlobSizeTextBox_LostFocus"/>
+        <Label Content="Agility mode for colour" HorizontalAlignment="Left" Margin="22,321,0,0" VerticalAlignment="Top" Width="163"/>
+        <CheckBox x:Name="agilityModeCheckBox" Content="" HorizontalAlignment="Left" Margin="198,326,0,0" VerticalAlignment="Top" Height="35" Width="44" Checked="agilityModeCheckBox_Checked"/>
 
     </Grid>
 </UserControl>

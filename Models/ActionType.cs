@@ -8,5 +8,6 @@
         DoubleLeftClick,
         DrinkAllPot,
         None, //Wait
+        ClickColBox,
     }
 }
