@@ -1,4 +1,6 @@
-﻿namespace BetterClicker.Models
+﻿using System.Collections.Generic;
+
+namespace BetterClicker.Models
 {
     public class SettingsModel
     {
@@ -11,5 +13,8 @@
         public Point ScreenCenter { get; set; }
         public int? MinBlobSize { get; set; }
         public bool AgilityMode { get; set; }
+        public Point WorldHopLeftTop { get; set; }
+        public Point WorldHopRightBottom { get; set; }
+        public int WorldHopCount { get; set; }
     }
 }

@@ -16,11 +16,15 @@ using System.Threading;
 using BetterClicker.Models;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
+using System.IO;
 
 namespace BetterClicker.Logic
 {
     public class ImageProcessingLogic
     {
+        private bool Retried;
+        private int previousSize;
+
         public Random Random { get; private set; }
         public SettingsModel Settings
         {
@@ -30,28 +34,24 @@ namespace BetterClicker.Logic
             }
         }
 
-        public Bitmap ConditionImage { get; private set; }
+        public Dictionary<string, Bitmap> ConditionImages { get; private set; }
 
         public ImageProcessingLogic()
         {
             this.Random = new Random(DateTime.Now.Millisecond);
         }
 
-        public Models.Point GetColouredBoxPoint()
+        public Models.Point GetColouredBoxPoint(ActionType actionType)
         {
-            // Open your image
-
-            Bitmap image = GetScreenshot();
             // locating objects
-            var centerPoint = FindBlobs(image);
-            //image.Save(@"C:\RBP\result.png");
+            var centerPoint = FindBlobs(actionType);
             return centerPoint;
         }
 
-        private Bitmap GetScreenshot()
+        private Bitmap GetScreenshot(string name = "Base")
         {
             double screenLeft = SystemParameters.VirtualScreenLeft;
-            
+
             double screenTop = SystemParameters.VirtualScreenTop;
             double screenWidth = SystemParameters.PrimaryScreenWidth;
             double screenHeight = SystemParameters.PrimaryScreenHeight;
@@ -61,45 +61,67 @@ namespace BetterClicker.Logic
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 g.CopyFromScreen((int)screenLeft, (int)screenTop, 0, 0, bmp.Size);
+                SaveImage(bmp, $"{name}UnProcessed.png");
+                return bmp;
+            }
+        }
+        private Bitmap GetScreenshot(Rectangle field)
+        {
+            Bitmap bmp = new Bitmap(field.Width, field.Height, PixelFormat.Format32bppArgb);
+
+            using (Graphics g = Graphics.FromImage(bmp))
+            {
+                g.CopyFromScreen(field.Left, field.Top, 0, 0, field.Size, CopyPixelOperation.SourceCopy);
                 return bmp;
             }
         }
 
-        public Models.Point FindBlobs(Bitmap image)
+        public Models.Point FindBlobs(ActionType actionType)
         {
+            switch (actionType)
+            {
+                case ActionType.ClickRedBox:
+                    return GetRedBiggestBlob();
+                case ActionType.ClickGreenBox:
+                    return GetGreenBiggestBlob();
+                case ActionType.QuickGreenBox:
+                    return GetGreenQuickBiggest();
+                default:
+                    break;
+            }
+            Bitmap image = GetScreenshot("NormalGreen");
             FilterOutGreenBlobs(image);
-            
-            BlobCounter blobCounter = new BlobCounter();
-            blobCounter.FilterBlobs = true;
-            blobCounter.MinHeight = Settings.MinBlobSize ?? 40;
-            blobCounter.MinWidth = Settings.MinBlobSize ?? 40;
+
+            BlobCounter blobCounter = GetBlobCounter();
             blobCounter.ProcessImage(image);
             Blob[] blobs = blobCounter.GetObjectsInformation();
 
             Graphics g2 = Graphics.FromImage(image);
-            foreach (var redBlob in blobs)
+            foreach (var blob in blobs)
             {
-                g2.DrawRectangle(new Pen(Color.Green, 3.0f), redBlob.Rectangle);
+                g2.DrawRectangle(new Pen(Color.White, 3.0f), blob.Rectangle);
             }
-            image.Save(@"C:\RBP\GreenResultMarked.png");
+            SaveImage(image, "greenResultMarked.png");
 
             if (blobs.Length == 0)
             {
-                var newImage = GetScreenshot();
+                var newImage = GetScreenshot("FailedGreenRed");
                 FilterOutRedBlobs(newImage);
                 blobCounter.ProcessImage(newImage);
                 Blob[] redBlobs = blobCounter.GetObjectsInformation();
                 Graphics g = Graphics.FromImage(newImage);
                 foreach (var redBlob in redBlobs)
                 {
-                    g.DrawRectangle(new Pen(Color.Green, 3.0f), redBlob.Rectangle);
+                    g.DrawRectangle(new Pen(Color.Red, 3.0f), redBlob.Rectangle);
                 }
-                newImage.Save(@"C:\RBP\RedResultMarked.png");
+                SaveImage(newImage, "RedResultMarked.png");
                 if (Settings.AgilityMode)
                 {
                     if (redBlobs.Length == 2)
                     {
-                        var smallBlob = redBlobs.Where(x => x.Area < 650).OrderByDescending(x => x.Rectangle.X).FirstOrDefault();
+                        var rectanlge = GetConditionRectangle(Settings.ConditionLeftTop, Settings.ConditionRightBottom);
+                        var conditionArea = rectanlge.Width * rectanlge.Height;
+                        var smallBlob = redBlobs.Where(x => x.Area < conditionArea).OrderByDescending(x => x.Area).FirstOrDefault();
                         if (smallBlob == null)
                         {
                             smallBlob = redBlobs.FirstOrDefault();
@@ -107,7 +129,7 @@ namespace BetterClicker.Logic
                         var point = GetPointFromEdgeToCenter(blobCounter, smallBlob, true);
                         MouseActions.DoLeftClick(point);
                         Thread.Sleep(4000);
-                        return GetColouredBoxPoint();
+                        return GetColouredBoxPoint(actionType);
                     }
                 }
                 if (redBlobs.Length > 1)
@@ -133,64 +155,187 @@ namespace BetterClicker.Logic
                 else
                 {
                     Thread.Sleep(2000);
-                    return GetColouredBoxPoint();
+                    return GetColouredBoxPointRetry(actionType);
                 }
             }
             // check for rectangles
+            switch (actionType)
+            {
+                case ActionType.ClickBiggestColBox:
+                    return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
+                case ActionType.ClickNearestToCenterColBox:
+                    return GetClosestToCenterBlob(image, blobCounter, blobs);
+                default:
+                    return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
+            }
+        }
+
+        public Models.Point GetRedBiggestBlob()
+        {
+            Bitmap image = GetScreenshot("red");
+            FilterOutRedBlobs(image);
+
+            BlobCounter blobCounter = GetBlobCounter();
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+
+            Graphics g2 = Graphics.FromImage(image);
+            foreach (var blob in blobs)
+            {
+                g2.DrawRectangle(new Pen(Color.White, 3.0f), blob.Rectangle);
+            }
+            SaveImage(image, "redResultMarked.png");
+
             return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
+        }
+
+        public Models.Point GetGreenBiggestBlob()
+        {
+            Bitmap image = GetScreenshot("green");
+            FilterOutGreenBlobs(image);
+
+            BlobCounter blobCounter = GetBlobCounter();
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+
+            Graphics g2 = Graphics.FromImage(image);
+            foreach (var blob in blobs)
+            {
+                g2.DrawRectangle(new Pen(Color.White, 3.0f), blob.Rectangle);
+            }
+            SaveImage(image, "greenResultMarked.png");
+
+            return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
+        }
+
+        public Models.Point GetGreenQuickBiggest()
+        {
+            Bitmap image = GetScreenshot("greenQuick");
+            FilterOutGreenBlobs(image);
+
+            BlobCounter blobCounter = GetBlobCounter();
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+
+            var biggestBlob = blobs.OrderByDescending(x => x.Area).FirstOrDefault();
+            if (biggestBlob == null)
+            {
+                return new Models.Point(0, 0);
+            }
+            var center = biggestBlob.CenterOfGravity;
+            return new Models.Point((int)center.X, (int)center.Y);
+        }
+
+        private BlobCounter GetBlobCounter()
+        {
+            BlobCounter blobCounter = new BlobCounter();
+            blobCounter.FilterBlobs = true;
+            blobCounter.MinHeight = Settings.MinBlobSize ?? 40;
+            blobCounter.MinWidth = Settings.MinBlobSize ?? 40;
+            return blobCounter;
+        }
+
+        private Models.Point GetColouredBoxPointRetry(ActionType actionType)
+        {
+            if (this.Retried)
+            {
+                this.Retried = false;
+                return new Models.Point(0, 0);
+            }
+            this.Retried = true;
+            return GetColouredBoxPoint(actionType);
         }
 
         public void SetCondition()
         {
-            Bitmap conditionImage = GetConditionImage();
-            this.ConditionImage = conditionImage;
+            this.ConditionImages = new Dictionary<string, Bitmap>();
+            Bitmap conditionImage = GetConditionImage(Settings.ConditionLeftTop, Settings.ConditionRightBottom);
+            var key = MakeConditionsString(Settings.ConditionLeftTop, Settings.ConditionRightBottom);
+            SaveImage(conditionImage, $"{key}ConditionStart.png");
+            this.ConditionImages.Add(key, conditionImage);
         }
 
-        private Bitmap GetConditionImage()
+        public void AddCondition(BetterClicker.Models.Point leftTop, BetterClicker.Models.Point rightBottom)
         {
-            var width = Settings.ConditionRightBottom.X - Settings.ConditionLeftTop.X;
-            var height = Settings.ConditionRightBottom.Y - Settings.ConditionLeftTop.Y;
-            var rectangle = new Rectangle(Settings.ConditionLeftTop.X, Settings.ConditionLeftTop.Y, width, height);
-
-
-            var image = GetScreenshot();
-            Bitmap cloneBitmap = image.Clone(rectangle, image.PixelFormat);
-            return cloneBitmap;
+            this.ConditionImages = new Dictionary<string, Bitmap>();
+            Bitmap conditionImage = GetConditionImage(leftTop, rightBottom);
+            var key = MakeConditionsString(leftTop, rightBottom);
+            SaveImage(conditionImage, $"{key}ActionCondition.png");
+            this.ConditionImages.Add(key, conditionImage);
         }
 
-        public bool IsConditionMet()
+        private string MakeConditionsString(Models.Point topLeft, Models.Point bottomRight)
         {
-            var currentImage = GetConditionImage();
-            var isSame = Utils.AreEqual(currentImage, ConditionImage);
+            return $"{topLeft.X}-{topLeft.Y}_{bottomRight.X}-{bottomRight.Y}";
+        }
+
+        public Bitmap GetConditionImage(Models.Point topLeft, Models.Point bottomRight)
+        {
+            Rectangle rectangle = GetConditionRectangle(topLeft, bottomRight);
+
+            var image = GetScreenshot(rectangle);
+            var conditionKey = MakeConditionsString(topLeft, bottomRight);
+            SaveImage(image, $"{conditionKey}_current.png");
+
+            return image;
+        }
+
+        private Rectangle GetConditionRectangle(Models.Point topLeft, Models.Point bottomRight)
+        {
+            var width = bottomRight.X - topLeft.X;
+            var height = bottomRight.Y - topLeft.Y;
+            var rectangle = new Rectangle(topLeft.X, topLeft.Y, width, height);
+            return rectangle;
+        }
+
+        public bool IsConditionMet(Models.Point topLeft, Models.Point bottomRight)
+        {
+            var conditionKey = MakeConditionsString(topLeft, bottomRight);
+            if (!ConditionImages.TryGetValue(conditionKey, out Bitmap baseImage))
+            {
+                var image = GetConditionImage(topLeft, bottomRight);
+                ConditionImages.Add(conditionKey, image);
+                return false;
+            }
+
+            var currentImage = GetConditionImage(topLeft, bottomRight);
+            var isSame = Utils.AreEqual(currentImage, baseImage);
             return isSame;
         }
 
         private static void FilterOutRedBlobs(Bitmap image)
         {
-            image.Save(@"C:\RBP\original.png", ImageFormat.Png);
-            YCbCrFiltering filter = new YCbCrFiltering();
+            ColorFiltering filter = new ColorFiltering();
             // set color ranges to keep
-            filter.Cb = new Range(-0.2f, -0.05f);
-            filter.Cr = new Range(0.2f, 0.5f);
+            filter.Red = new IntRange(140, 255);
+            filter.Green = new IntRange(0, 60);
+            filter.Blue = new IntRange(140, 255);
 
             filter.ApplyInPlace(image);
-            image.Save(@"C:\RBP\redresult.png", ImageFormat.Png);
         }
 
         private static void FilterOutGreenBlobs(Bitmap image)
         {
             YCbCrFiltering filter = new YCbCrFiltering();
             // set color ranges to keep
-            filter.Cb = new Range(-0.7f, -0.1f);
-            filter.Cr = new Range(-0.7f, -0.1f);
+            filter.Cb = new Range(-0.7f, -0.2f);
+            filter.Cr = new Range(-0.7f, -0.2f);
+
 
             filter.ApplyInPlace(image);
         }
 
+
+        private static void SaveImage(Bitmap image, string fileName)
+        {
+            var directory = System.AppDomain.CurrentDomain.BaseDirectory;
+            var path = Path.Combine(directory, "screenshots", fileName);
+
+            image.Save(path);
+        }
+
         private Models.Point GetBiggestBlobRandomMedianFromCenterToEdge(Bitmap image, BlobCounter blobCounter, Blob[] blobs)
         {
-            var corners = new List<IntPoint>();
-            SimpleShapeChecker shapeChecker = new SimpleShapeChecker();
             var biggestBlob = blobs.OrderByDescending(x => x.Area).FirstOrDefault();
             if (biggestBlob != null)
             {
@@ -198,15 +343,31 @@ namespace BetterClicker.Logic
             }
             return new Models.Point(0, 0);
         }
+        private Models.Point GetClosestToCenterBlob(Bitmap image, BlobCounter blobCounter, Blob[] blobs)
+        {
+            Blob closestBlob = GetClosestToCenterBlobBlob(blobs);
+            if (closestBlob != null)
+            {
+                return GetPointFromEdgeToCenter(blobCounter, closestBlob);
+            }
+            return new Models.Point(0, 0);
+        }
 
-        private Models.Point GetPointFromEdgeToCenter(BlobCounter blobCounter, Blob blob, bool prettyAccurate = false)
+        private Blob GetClosestToCenterBlobBlob(Blob[] blobs)
+        {
+            var centerPoint = new AForge.Point(Settings.ScreenCenter.X, Settings.ScreenCenter.Y);
+            var closestBlob = blobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
+            return closestBlob;
+        }
+
+        private Models.Point GetPointFromEdgeToCenter(BlobCounter blobCounter, Blob blob, bool prettyAccurate = true)
         {
             var edges = blobCounter.GetBlobsEdgePoints(blob);
             var randomEdgeNumber = Random.Next(edges.Count);
             var randomEdge = edges[randomEdgeNumber];
 
             var point = blob.CenterOfGravity;
-            var randomValue = Random.Next(15, 85);
+            var randomValue = Random.Next(1, 85);
 
             float randomPercent = randomValue / 100f;
             var xDelta = (point.X - randomEdge.X) * randomPercent;
@@ -221,9 +382,59 @@ namespace BetterClicker.Logic
 
             return new Models.Point((int)resultX, (int)resultY);
         }
-        private static double GetDistance(double x1, double y1, double x2, double y2)
+
+        internal Models.Point SearchForGreen(int searchDelay, CancellationToken token)
         {
-            return Math.Sqrt(Math.Pow((x2 - x1), 2) + Math.Pow((y2 - y1), 2));
+            var ignoreCounter = 0;
+            for (int i = 0; i < 60; i++)
+            {
+                if (token.IsCancellationRequested)
+                    return new Models.Point(0, 0);
+
+                Thread.Sleep(searchDelay);
+                var result = GetGreenClosestToCenterGreenBlob();
+                if (result.Size == 0 || previousSize * 0.7 < result.Size && result.Size < previousSize*1.3)
+                {
+                    if (ignoreCounter < 5)
+                    {
+                        ignoreCounter++;
+                        continue;
+                    }
+                }
+                previousSize = result.Size;
+
+                if (result.Point.X != 0)
+                {
+                    return result.Point;
+                }
+            }
+            return new Models.Point(0, 0);
+        }
+
+
+        internal (int Size, Models.Point Point) GetGreenClosestToCenterGreenBlob()
+        {
+            Bitmap image = GetScreenshot("green");
+            FilterOutGreenBlobs(image);
+
+            BlobCounter blobCounter = GetBlobCounter();
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+
+            Graphics g2 = Graphics.FromImage(image);
+            foreach (var blob in blobs)
+            {
+                g2.DrawRectangle(new Pen(Color.White, 3.0f), blob.Rectangle);
+            }
+            SaveImage(image, "greenResultMarked.png");
+
+            var resultBlob = GetClosestToCenterBlobBlob(blobs);
+            var resultPoint = new Models.Point(0, 0);
+            if (resultBlob != null)
+            {
+                resultPoint = GetPointFromEdgeToCenter(blobCounter, resultBlob);
+            }
+            return ( Size: resultBlob?.Area ?? 0, Point: resultPoint );
         }
     }
 }

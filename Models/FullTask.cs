@@ -19,10 +19,19 @@ namespace BetterClicker.Models
         public string Name { get; set; }
         public int RepeatTaskTimes { get; set; }
         public int TimeBetweenTasks { get; set; }
+        public string IgnoreInvSpaces { get; set; }
+        public List<int> IgnoreInvSpacesList { get; set; }
         public bool IsPublic { get; set; }
         public override string ToString()
         {
             return Name;
+        }
+
+        public FullTask ShallowCopy()
+        {
+            var result = (FullTask)this.MemberwiseClone();
+            result.MouseActions = new ObservableCollection<MouseActionModel>(result.MouseActions.Select(x => x.ShallowCopy()));
+            return result;
         }
     }
 }

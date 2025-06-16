@@ -30,8 +30,16 @@
         <Button x:Name="readConditionButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="345,222,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readConditionButton_Click" />
         <Label Content="Min blob size" HorizontalAlignment="Left" Margin="25,290,0,0" VerticalAlignment="Top" Width="163"/>
         <TextBox x:Name="minBlobSizeTextBox" HorizontalAlignment="Left" Height="22" Margin="197,290,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="minBlobSizeTextBox_LostFocus"/>
-        <Label Content="Agility mode for colour" HorizontalAlignment="Left" Margin="22,321,0,0" VerticalAlignment="Top" Width="163"/>
-        <CheckBox x:Name="agilityModeCheckBox" Content="" HorizontalAlignment="Left" Margin="198,326,0,0" VerticalAlignment="Top" Height="35" Width="44" Checked="agilityModeCheckBox_Checked"/>
+        <Label Content="Agility mode for colour" HorizontalAlignment="Left" Margin="20,320,0,0" VerticalAlignment="Top" Width="163"/>
+        <CheckBox x:Name="agilityModeCheckBox" Content="" HorizontalAlignment="Left" Margin="198,326,0,0" VerticalAlignment="Top" Height="35" Width="44" Click="agilityModeCheckBox_Changed"/>
+        <Button x:Name="takeScreenshotsButton" Content="Take screeshots&#xD;&#xA;" HorizontalAlignment="Left" Margin="830,28,0,0" VerticalAlignment="Top" Width="145" Height="44" Click="takeScreenshotsButton_Click" />
+        <Label x:Name="___No_Name__Copy1" Content="WolrdHopRightTop" HorizontalAlignment="Left" Margin="26,357,0,0" VerticalAlignment="Top" Width="131"/>
+        <TextBox x:Name="worldHopLeftTop_TextBox" HorizontalAlignment="Left" Height="23" Margin="199,359,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Label Content="WorldHopRightBottom" HorizontalAlignment="Left" Margin="25,391,0,0" VerticalAlignment="Top" Width="145"/>
+        <TextBox x:Name="worldHopRightBottom_TextBox" HorizontalAlignment="Left" Height="23" Margin="199,393,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
+        <Button x:Name="readWorldHopButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="346,359,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readWorldHopButton_Click" />
+        <Label Content="Wolrd Hop Count" HorizontalAlignment="Left" Margin="28,424,0,0" VerticalAlignment="Top" Width="134"/>
+        <TextBox x:Name="worldHopCountTextBox" HorizontalAlignment="Left" Height="24" Margin="199,425,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="138" LostFocus="worldHopCountTextBox_LostFocus" />
 
     </Grid>
 </UserControl>

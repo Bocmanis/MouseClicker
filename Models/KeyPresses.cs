@@ -10,6 +10,16 @@ namespace BetterClicker.Models
     {
         None,
         Esc,
-        Shift
+        Shift,
+        Ctrl,
+        Space,
+        Q,
+        W,
+        E,
+        R,
+        One,
+        Two,
+        Three, 
+        Four,
     }
 }

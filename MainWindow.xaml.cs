@@ -23,6 +23,7 @@ using BetterClicker.Logic;
 using BetterClicker.Models;
 using BetterClicker.Win32Actions;
 using BetterClicker.Controls;
+using System.Runtime.InteropServices.ComTypes;
 
 namespace BetterClicker
 {
@@ -33,18 +34,25 @@ namespace BetterClicker
     {
 
         public static AppModel AppModel { get; private set; }
-        private string FilePath = "saveFile.json";
+        private string FilePath = SettingsUserControl.FilePath;
         public MainWindow()
         {
             InitializeComponent();
             AppModel = GetConfig();
+            var directory = System.AppDomain.CurrentDomain.BaseDirectory;
+            var path = System.IO.Path.Combine(directory, "screenshots");
+            Directory.CreateDirectory(path);
+
             this.viewBox.Content = new TaskViewxaml();
         }
         private AppModel GetConfig()
         {
             var path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, FilePath);
+
+
             if (!File.Exists(path))
             {
+                File.Create(path);
                 return GetBaseEmptyModel();
             }
             using (StreamReader inputFile = new StreamReader(path))

@@ -73,20 +73,25 @@ namespace BetterClicker.Win32Actions
             mouse_event(MOUSEEVENTF_RIGHTDOWN, 0, 0, 0, 0);
             mouse_event(MOUSEEVENTF_RIGHTUP, 0, 0, 0, 0);
         }
-        public static void DoLeftClick(Point point)
+        public static void DoLeftClick(Point point, bool noDelay = false)
         {
-            SetCursorPosition(point.X, point.Y);
+            SetCursorPosition(point.X, point.Y, noDelay);
             mouse_event(MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0);
             mouse_event(MOUSEEVENTF_LEFTUP, 0, 0, 0, 0);
         }
 
-        private static void SetCursorPosition(int x, int y)
+
+        private static void SetCursorPosition(int x, int y, bool noDelay = false)
         {
             if (x==0)
             {
                 return;
             }
             SetCursorPos(x, y);
+            if (noDelay)
+            {
+                return;
+            }
             Thread.Sleep(100 + DateTime.Now.Millisecond/10);
         }
 

@@ -15,8 +15,9 @@ namespace BetterClicker.Models
         }
         public ObservableCollection<FullTask> FullTasks { get; set; }
         public string Name { get; set; }
-
         public bool OnRepeat { get; set; }
+        public bool NoDelay { get; set; }
+
         public override string ToString()
         {
             var repeatSymbol = OnRepeat ? "↺" : "1";

@@ -27,6 +27,8 @@ namespace BetterClicker.Controls
     {
         public bool InventoryPointReadActive { get; private set; }
         public bool ConditionPointReadActive { get; private set; }
+        public bool WorldHopPointReadActive { get; private set; }
+
         public bool CenterOfScreenPointReadActive { get; private set; }
 
 
@@ -47,12 +49,13 @@ namespace BetterClicker.Controls
             }
             this.doubleClickTextBox.Text = Settings.DoubleClickDelayMs?.ToString();
             this.inventoryPrecisionModifierTextBox.Text = Settings.InventoryPrecisionModifier?.ToString();
-            this.minBlobSizeTextBox.Text = Settings.MinBlobSize?.ToString();
             this.agilityModeCheckBox.IsChecked = Settings.AgilityMode;
+            this.minBlobSizeTextBox.Text = Settings.MinBlobSize?.ToString();
 
             SetInventoryPointTexts();
             SetConditionPointTexts();
             SetCenterOfScreenPointTexts();
+            SetWorldHopPointTexts();
         }
 
         private void SetInventoryPointTexts()
@@ -62,12 +65,19 @@ namespace BetterClicker.Controls
         }
         private void SetConditionPointTexts()
         {
-            this.rightBottomConditionTextBox.Text = MakeCoordinateString(Settings.ConditionLeftTop);
-            this.leftTopConditionTextBox.Text = MakeCoordinateString(Settings.ConditionRightBottom);
+            this.rightBottomConditionTextBox.Text = MakeCoordinateString(Settings.ConditionRightBottom);
+            this.leftTopConditionTextBox.Text = MakeCoordinateString(Settings.ConditionLeftTop);
         }
         private void SetCenterOfScreenPointTexts()
         {
             this.centerOfScreenTextBox_Copy.Text = MakeCoordinateString(Settings.ScreenCenter);
+        }
+
+        private void SetWorldHopPointTexts()
+        {
+            this.worldHopLeftTop_TextBox.Text = MakeCoordinateString(Settings.WorldHopLeftTop);
+            this.worldHopRightBottom_TextBox.Text = MakeCoordinateString(Settings.WorldHopRightBottom);
+            this.worldHopCountTextBox.Text = Settings.WorldHopCount.ToString();
         }
 
         private string MakeCoordinateString(Models.Point point)
@@ -116,6 +126,11 @@ namespace BetterClicker.Controls
                     Settings.ScreenCenter = MouseActions.GetMousePosition();
                     SetCenterOfScreenPointTexts();
                 }
+                if (this.WorldHopPointReadActive)
+                {
+                    Settings.WorldHopLeftTop = MouseActions.GetMousePosition();
+                    SetWorldHopPointTexts();
+                }
             }
             if (e.Key == Key.V)
             {
@@ -129,11 +144,16 @@ namespace BetterClicker.Controls
                     Settings.ConditionRightBottom = MouseActions.GetMousePosition();
                     SetConditionPointTexts();
                 }
+                if (this.WorldHopPointReadActive)
+                {
+                    Settings.WorldHopRightBottom = MouseActions.GetMousePosition();
+                    SetWorldHopPointTexts();
+                }
             }
             await SaveFile();
         }
 
-        private string FilePath = "saveFile.json";
+        public static string FilePath = "saveFile.json";
 
         private async Task SaveFile()
         {
@@ -198,10 +218,38 @@ namespace BetterClicker.Controls
             }
         }
 
-        private async void agilityModeCheckBox_Checked(object sender, RoutedEventArgs e)
+        private async void agilityModeCheckBox_Changed(object sender, RoutedEventArgs e)
         {
             Settings.AgilityMode = agilityModeCheckBox.IsChecked ?? false;
             await SaveFile();
+        }
+
+        private void takeScreenshotsButton_Click(object sender, RoutedEventArgs e)
+        {
+            new ImageProcessingLogic().GetRedBiggestBlob();
+            new ImageProcessingLogic().GetGreenBiggestBlob();
+        }
+
+        private void readWorldHopButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.WorldHopPointReadActive = !WorldHopPointReadActive;
+            if (WorldHopPointReadActive)
+            {
+                readWorldHopButton.Background = Brushes.Green;
+            }
+            else
+            {
+                readWorldHopButton.Background = Brushes.Gray;
+            }
+        }
+
+        private async void worldHopCountTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(worldHopCountTextBox.Text, out int worldCount))
+            {
+                Settings.WorldHopCount = worldCount;
+                await SaveFile();
+            }
         }
     }
 }

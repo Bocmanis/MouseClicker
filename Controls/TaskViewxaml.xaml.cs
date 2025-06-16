@@ -21,6 +21,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Windows.Threading;
 
 namespace BetterClicker.Controls
 {
@@ -35,10 +36,15 @@ namespace BetterClicker.Controls
         public TaskRunner CurrentTaskRunning { get; private set; }
         public AppModel AppModel { get; set; }
 
-        public ObservableCollection<OverTask> OverTasks { get; set; }
+        public ObservableCollection<OverTask> OverTaskSource { get; set; }
+        public ListCollectionView OverTasks { get; set; }
         public OverTask CurrentOverTask { get; private set; }
         public Stopwatch StopWatch { get; private set; }
         public TaskRunner TaskRunner { get; private set; }
+        public DispatcherTimer WaitTimeTimer { get; private set; }
+        public TimeSpan WaitTimeTotal { get; private set; }
+        public string GreenBoxTimeMessage { get; private set; }
+        public Exception CurrentException { get; private set; }
 
         public TaskViewxaml()
         {
@@ -51,12 +57,29 @@ namespace BetterClicker.Controls
             CreateGrids();
             ResetPublicMouseActionsContent();
             this.StopWatch = new Stopwatch();
+            WaitTimeTimer = new DispatcherTimer();
+            WaitTimeTimer.Tick += new EventHandler(OnTimerTick);
+            WaitTimeTimer.Interval = TimeSpan.FromMilliseconds(237);
+        }
+
+        private void OnTimerTick(object sender, EventArgs e)
+        {
+            if (CurrentTaskRunning?.DoStop ?? true)
+            {
+                waitTimeLogBox.Text = string.Empty;
+                StopWatch.Reset();
+                return;
+            }
+            var elapsed = StopWatch.Elapsed.ToString(@"mm\:ss\:fff");
+            var total = WaitTimeTotal.ToString(@"mm\:ss\:fff");
+
+            waitTimeLogBox.Text = $"{elapsed}/{total}";
         }
 
         private void ResetPublicMouseActionsContent()
         {
             fullTaskComboBox.ItemsSource = null;
-              fullTaskComboBox.ItemsSource = AppModel.PublicMouseActions;
+            fullTaskComboBox.ItemsSource = AppModel.PublicMouseActions;
             fullTaskComboBox.SelectedItem = AppModel?.PublicMouseActions?.FirstOrDefault();
             if (fullTaskComboBox.SelectedItem == null)
             {
@@ -70,12 +93,28 @@ namespace BetterClicker.Controls
 
         private void CreateGrids()
         {
-            OverTasks = AppModel.OverTasks;
-            CurrentOverTask = OverTasks.FirstOrDefault();
+            OverTaskSource = AppModel.OverTasks;
+            OverTasks = new ListCollectionView(OverTaskSource);
+
+           
             FullTasks = CurrentOverTask?.FullTasks;
 
             overTaskDataGrid.SelectionChanged += OverTaskDataGridSelectionChanged;
             overTaskDataGrid.ItemsSource = OverTasks;
+
+            if (!string.IsNullOrEmpty(AppModel.LastOverTaskName))
+            {
+                var selectTask = OverTaskSource.FirstOrDefault(x => x.Name == AppModel.LastOverTaskName);
+                if (selectTask != null)
+                {
+                    CurrentOverTask = selectTask;
+                }
+                else
+                {
+                    CurrentOverTask = OverTaskSource.FirstOrDefault();
+                }
+            }
+
             overTaskDataGrid.SelectedItem = CurrentOverTask;
 
             fullTasksDataGrid.CanUserAddRows = false;
@@ -148,7 +187,7 @@ namespace BetterClicker.Controls
 
         private void FullTasksDataGridSelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-                        ResetPublicMouseActions();
+            ResetPublicMouseActions();
 
             CurrentTask = (FullTask)fullTasksDataGrid.SelectedItem;
             if (CurrentTask != null && CurrentTask.IsPublic)
@@ -166,12 +205,15 @@ namespace BetterClicker.Controls
 
         private void addNewButtonName_Click(object sender, RoutedEventArgs e)
         {
-            FullTasks.Add(
-                new FullTask()
-                {
-                    MouseActionsId = Guid.NewGuid()
-                }
-            );
+            var newTask = new FullTask()
+            {
+                MouseActionsId = Guid.NewGuid(),
+                MouseActions = new ObservableCollection<MouseActionModel>(),
+            };
+            FullTasks.Add(newTask);
+
+            fullTasksDataGrid.SelectedItem = newTask;
+            addMouseActionButton_Click(sender, e);
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
@@ -186,22 +228,31 @@ namespace BetterClicker.Controls
             {
                 fullTasksDataGrid.Columns[0].Visibility = Visibility.Hidden;
                 fullTasksDataGrid.Columns[1].Visibility = Visibility.Hidden;
-                fullTasksDataGrid.Columns[2].Width = 263;
+                fullTasksDataGrid.Columns[2].Width = 150;
+                fullTasksDataGrid.Columns[6].Visibility = Visibility.Hidden;
             }
 
             if (mouseActionsDataGrid.Columns.Count != 0)
             {
-                mouseActionsDataGrid.Columns[2].Width = 300;
+                mouseActionsDataGrid.Columns[2].Width = 200;
+                mouseActionsDataGrid.Columns[7].Width = 156;
+                mouseActionsDataGrid.Columns[13].Width = 80;
+
             }
         }
 
         private void addMouseActionButton_Click(object sender, RoutedEventArgs e)
         {
-            CurrentTask.MouseActions.Add(new MouseActionModel() 
+            if (CurrentTask.MouseActions == null)
+            {
+                CurrentTask.MouseActions = new ObservableCollection<MouseActionModel>();
+            }
+
+            CurrentTask.MouseActions.Add(new MouseActionModel()
             {
                 ActionType = ActionType.LeftClick,
-                Wait = 350,
-                WaitDelta = 250,
+                Wait = 900,
+                WaitDelta = 300,
             });
         }
 
@@ -244,21 +295,39 @@ namespace BetterClicker.Controls
             {
                 return;
             }
+
+            AppModel.LastOverTaskName = CurrentOverTask.Name;
             await SaveFile();
             MouseActions.DoubleClickDelay = AppModel.Settings.DoubleClickDelayMs ?? 350;
             TaskRunner = new TaskRunner();
             TaskRunner.OnInfoChanged += onLoggerAddition;
+            TaskRunner.OnNewWaitTime += onNewWaitTimeLogger;
             CurrentTaskRunning = TaskRunner;
             new Thread(() =>
             {
                 Thread.CurrentThread.IsBackground = true;
                 /* run your code here */
-                TaskRunner.RunTasks(CurrentOverTask);
+                try
+                {
+                    TaskRunner.RunTasks(CurrentOverTask);
+                }
+                catch (Exception ex)
+                {
+                    CurrentException = ex;
+                    return;
+                }
+                
             }).Start();
         }
 
         private void onLoggerAddition(object sender, EventArgs e)
         {
+            InfoChangedEventArgs args = null;
+            if (e.GetType() == typeof(InfoChangedEventArgs))
+            {
+                args = (InfoChangedEventArgs)e;
+                GreenBoxTimeMessage = args.GreenBoxTimeMessage;
+            }
             this.Dispatcher.Invoke(() =>
             {
                 var repeat = TaskRunner.CurrentOverTask.OnRepeat ? $"RepeatOn, {TaskRunner.OverTaskCounter} times so far" : "Single";
@@ -271,6 +340,14 @@ namespace BetterClicker.Controls
                 stringBuilder.AppendLine($"-------------------------------------");
                 stringBuilder.AppendLine($"MA:  {TaskRunner.CurrentMouseAction?.TotallyNormalName}");
                 stringBuilder.AppendLine($"     {TaskRunner.MouseActionCounterText}");
+                stringBuilder.AppendLine($"Info: {sender}");
+                stringBuilder.AppendLine($"{GreenBoxTimeMessage}");
+                if (CurrentException != null)
+                {
+                    stringBuilder.AppendLine($"Error: {CurrentException.Message}");
+                    stringBuilder.AppendLine($"Stack: {CurrentException.StackTrace}");
+                }
+
                 if (TaskRunner.DoStop)
                 {
                     stringBuilder.AppendLine("\n Status: Stopped");
@@ -279,7 +356,18 @@ namespace BetterClicker.Controls
             });
         }
 
-        private string FilePath = "saveFile.json";
+        private void onNewWaitTimeLogger(object sender, EventArgs e)
+        {
+            WaitTimeTotal = TimeSpan.FromMilliseconds((int)sender);
+
+            this.Dispatcher.Invoke(() =>
+            {
+                StopWatch.Restart();
+                WaitTimeTimer.Start();
+            });
+        }
+
+        private string FilePath = SettingsUserControl.FilePath;
         private async void saveConfigButton_Click(object sender, RoutedEventArgs e)
         {
             await SaveFile();
@@ -306,6 +394,7 @@ namespace BetterClicker.Controls
                 return;
             }
             CurrentTaskRunning.DoStop = true;
+
         }
 
         private void Button_Click_1(object sender, RoutedEventArgs e)
@@ -315,7 +404,7 @@ namespace BetterClicker.Controls
                 FullTasks = new ObservableCollection<FullTask>(),
                 Name = "New..",
             };
-            OverTasks.Add(overTask);
+            OverTaskSource.Add(overTask);
             overTaskDataGrid.SelectedItem = overTask;
         }
 
@@ -332,8 +421,12 @@ namespace BetterClicker.Controls
         private void addTaskFromComboBoxButton_Click(object sender, RoutedEventArgs e)
         {
             var fullTask = (FullTask)fullTaskComboBox.SelectedItem;
-            CurrentOverTask.FullTasks.Add(fullTask);
-            overTaskDataGrid.SelectedItem = fullTask;
+            FullTasks = CurrentOverTask?.FullTasks;
+            fullTasksDataGrid.ItemsSource = null;
+            fullTasksDataGrid.ItemsSource = CurrentOverTask?.FullTasks;
+            fullTasksDataGrid.SelectedItem = CurrentOverTask?.FullTasks?.FirstOrDefault();
+
+            CurrentTask = (FullTask)fullTasksDataGrid.SelectedItem;
         }
 
         private void mouseActionsDataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
@@ -347,10 +440,48 @@ namespace BetterClicker.Controls
 
         private void deleteOvertaskButton_Click(object sender, RoutedEventArgs e)
         {
-            OverTasks.Remove(CurrentOverTask);
+            OverTaskSource.Remove(CurrentOverTask);
             overTaskDataGrid.ItemsSource = null;
             overTaskDataGrid.ItemsSource = OverTasks;
-            overTaskDataGrid.SelectedItem = OverTasks.FirstOrDefault();
+            overTaskDataGrid.SelectedItem = OverTasks.CurrentItem;
+        }
+
+        private void overTaskNameSearchBox_TextInput(object sender, TextCompositionEventArgs e)
+        {
+
+        }
+
+        private void overTaskNameSearchBox_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            var textBox = e.OriginalSource as TextBox;
+            var text = textBox.Text;
+
+            OverTasks.Filter = x =>
+            {
+                if (string.IsNullOrEmpty(text))
+                    return true;
+
+                OverTask task = x as OverTask;
+
+                return task.Name.Contains(text, StringComparison.OrdinalIgnoreCase);
+            };
+            overTaskDataGrid.IsDropDownOpen = true;
+        }
+
+        private async void copyTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentTask == null)
+            {
+                return;
+            }
+            var task = CurrentTask.ShallowCopy();
+            CurrentOverTask.FullTasks.Add(task);
+            await SaveFile();
+        }
+
+        private void doWithoutDelayCheckbox_Checked(object sender, RoutedEventArgs e)
+        {
+            CurrentOverTask.NoDelay = doWithoutDelayCheckbox.IsChecked ?? false;
         }
     }
 }
