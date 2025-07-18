@@ -12,20 +12,24 @@
             <ColumnDefinition Width="873*"/>
         </Grid.ColumnDefinitions>
         <DataGrid x:Name="fullTasksDataGrid" HorizontalAlignment="Left" Height="182" Margin="18,40,0,0" VerticalAlignment="Top" Width="544" Grid.ColumnSpan="2" />
-        <Button x:Name="addNewButtonName" Content=" Add empty task" HorizontalAlignment="Left" Margin="458,76,0,0" VerticalAlignment="Top" Width="110" Height="22" Click="addNewButtonName_Click" Grid.Column="1"/>
-        <DataGrid x:Name="mouseActionsDataGrid" HorizontalAlignment="Left" Height="198" Margin="30,303,0,0" VerticalAlignment="Top" Width="964" Grid.ColumnSpan="2" AutoGeneratingColumn="mouseActionsDataGrid_AutoGeneratingColumn"/>
-        <Button x:Name="addMouseActionButton" Content="Add action" HorizontalAlignment="Left" Margin="371,268,0,0" VerticalAlignment="Top" Width="82" Height="22" Click="addMouseActionButton_Click" Grid.Column="1" />
-        <Button x:Name="startTaskButton" Content="Start" HorizontalAlignment="Left" Margin="475,110,0,0" VerticalAlignment="Top" Width="88" Click="startTaskButton_Click" Grid.Column="1" Height="54"/>
-        <Label Content="C: to get base, V: to get rectangle" HorizontalAlignment="Left" Margin="686,497,-14,-4" VerticalAlignment="Top" Width="222" Grid.Column="1"/>
+        <Button x:Name="addNewButtonName" Content=" Add empty task" HorizontalAlignment="Left" Margin="455,83,0,0" VerticalAlignment="Top" Width="121" Height="22" Click="addNewButtonName_Click" Grid.Column="1"/>
+        <DataGrid x:Name="mouseActionsDataGrid" HorizontalAlignment="Left" Margin="15,308,0,15" Grid.ColumnSpan="2" AutoGeneratingColumn="mouseActionsDataGrid_AutoGeneratingColumn" Width="964" />
+        <Button x:Name="addMouseActionButton" Content="Add action" HorizontalAlignment="Left" Margin="369,279,0,0" VerticalAlignment="Top" Width="82" Height="22" Click="addMouseActionButton_Click" Grid.Column="1" />
+        <Button x:Name="startTaskButton" Content="Start" HorizontalAlignment="Left" Margin="455,110,0,0" VerticalAlignment="Top" Width="121" Click="startTaskButton_Click" Grid.Column="1" Height="35"/>
+        <Label Content="C: to get base, V: to get rectangle" HorizontalAlignment="Left" Margin="578,278,0,0" VerticalAlignment="Top" Width="222" Grid.Column="1"/>
         <Button x:Name="saveConfigButton" Content="Save config" HorizontalAlignment="Left" Margin="758,6,0,0" VerticalAlignment="Top" Width="120" Height="20" Click="saveConfigButton_Click" Grid.Column="1" />
-        <TextBlock x:Name="logTextBox" HorizontalAlignment="Left" Margin="672,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="219" Width="208" Grid.Column="1"/>
-        <Button Content="Stop" HorizontalAlignment="Left" Margin="473,168,0,0" VerticalAlignment="Top" Width="91" Click="Button_Click" Grid.Column="1" Height="76"/>
-        <ComboBox x:Name="overTaskDataGrid" HorizontalAlignment="Left" Height="26" Margin="20,6,0,0" VerticalAlignment="Top" Width="543" Grid.ColumnSpan="2"/>
+        <TextBlock x:Name="logTextBox" HorizontalAlignment="Left" Margin="606,72,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="219" Width="274" Grid.Column="1"/>
+        <Button Content="Stop" HorizontalAlignment="Left" Margin="455,150,0,0" VerticalAlignment="Top" Width="121" Click="Button_Click" Grid.Column="1" Height="110"/>
+        <ComboBox x:Name="overTaskDataGrid" IsEditable="True" HorizontalAlignment="Left" Height="26" Margin="20,6,0,0" VerticalAlignment="Top" Width="543" Grid.ColumnSpan="2" />
         <Button Content="+" HorizontalAlignment="Left" Margin="688,6,0,0" VerticalAlignment="Top" Width="32" Click="Button_Click_1" Grid.Column="1"/>
         <TextBox x:Name="overTaskNameTextBox" Grid.Column="1" HorizontalAlignment="Left" Height="23" Margin="448,6,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="168" LostFocus="overTaskNameTextBox_LostFocus"/>
         <CheckBox x:Name="overtaskOnRepeatCheckBox" Content="Repeat" Grid.Column="1" HorizontalAlignment="Left" Margin="624,8,0,0" VerticalAlignment="Top" Checked="overtaskOnRepeatCheckBox_Checked"/>
         <ComboBox x:Name="fullTaskComboBox" Grid.Column="1" HorizontalAlignment="Left" Margin="454,46,0,0" VerticalAlignment="Top" Width="276"/>
         <Button x:Name="addTaskFromComboBoxButton" Content="Add task" Grid.Column="1" HorizontalAlignment="Left" Margin="741,46,0,0" VerticalAlignment="Top" Width="74" Click="addTaskFromComboBoxButton_Click"/>
         <Button x:Name="deleteOvertaskButton" Content="🗑️" Grid.Column="1" HorizontalAlignment="Left" Margin="726,6,0,0" VerticalAlignment="Top" Width="26" Click="deleteOvertaskButton_Click"/>
+        <TextBlock x:Name="waitTimeLogBox" HorizontalAlignment="Left" Margin="455,277,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Height="32" Width="121" Grid.Column="1"/>
+        <TextBox x:Name="overTaskNameSearchBox" HorizontalAlignment="Left" Height="23" Margin="20,278,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="237" TextInput="overTaskNameSearchBox_TextInput" Grid.ColumnSpan="2" TextChanged="overTaskNameSearchBox_TextChanged"/>
+        <Button x:Name="copyTaskButton" Content="Copy task" HorizontalAlignment="Left" Margin="352,232,0,0" VerticalAlignment="Top" Width="88" Grid.Column="1" Height="28" Click="copyTaskButton_Click"/>
+        <CheckBox x:Name="doWithoutDelayCheckbox" Content="No delay" Grid.Column="1" HorizontalAlignment="Left" Margin="821,46,0,0" VerticalAlignment="Top" Checked="doWithoutDelayCheckbox_Checked"/>
     </Grid>
 </UserControl>

@@ -8,6 +8,13 @@
         DoubleLeftClick,
         DrinkAllPot,
         None, //Wait
-        ClickColBox,
+        ClickBiggestColBox,
+        ClickNearestToCenterColBox,
+        ClickRedBox,
+        ClickGreenBox,
+        WorldHop,
+        QuickGreenBox,
+        WaitForCondition,
+        FindGreens,
     }
 }

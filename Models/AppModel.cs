@@ -12,6 +12,7 @@ namespace BetterClicker.Models
         public ObservableCollection<OverTask> OverTasks { get; set; }
         public SettingsModel Settings { get; set; }
         public List<FullTask> PublicMouseActions { get; set; }
+        public string LastOverTaskName { get; set; } = string.Empty;
 
     }
 }

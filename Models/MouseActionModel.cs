@@ -35,7 +35,11 @@ namespace BetterClicker.Models
         public KeyPresses ClickKey { get; set; }
 
         [DisplayName("Con")]
-        public bool CheckCondition { get; set; }
+        public ConditionType CheckCondition { get; set; }
 
+        public MouseActionModel ShallowCopy()
+        {
+            return (MouseActionModel)this.MemberwiseClone();
+        }
     }
 }

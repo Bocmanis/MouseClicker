@@ -10,6 +10,11 @@ namespace BetterClicker.Logic
 {
     public static class Utils
     {
+        public static bool Contains(this string text, string compareText, StringComparison stringComparison)
+        {
+            return text.IndexOf(compareText, stringComparison) >= 0;
+        }
+
         public static byte[] ShaHash(this Image image)
         {
             var bytes = new byte[1];
