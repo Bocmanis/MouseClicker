@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -17,10 +18,18 @@ namespace BetterClicker.Models
         public Guid? MouseActionsId { get; set; }
         public ObservableCollection<MouseActionModel> MouseActions { get; set; }
         public string Name { get; set; }
+
+        [DisplayName("Rep")]
         public int RepeatTaskTimes { get; set; }
+
+        [DisplayName("Delay")]
         public int TimeBetweenTasks { get; set; }
+
+        [DisplayName("Skip")]
         public string IgnoreInvSpaces { get; set; }
         public List<int> IgnoreInvSpacesList { get; set; }
+
+        [DisplayName("Pub")]
         public bool IsPublic { get; set; }
         public override string ToString()
         {

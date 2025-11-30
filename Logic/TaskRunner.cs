@@ -112,7 +112,7 @@ namespace BetterClicker.Logic
                 return;
             }
 
-            if (overTask.OnRepeat)
+            if (overTask.RepeatCount > 0 && this.OverTaskCounter < overTask.RepeatCount)
             {
                 this.OverTaskCounter++;
                 DoOverTask(overTask);

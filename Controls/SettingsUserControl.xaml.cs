@@ -17,6 +17,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Diagnostics;
+using System.Windows.Threading;
 
 namespace BetterClicker.Controls
 {
@@ -70,7 +72,7 @@ namespace BetterClicker.Controls
         }
         private void SetCenterOfScreenPointTexts()
         {
-            this.centerOfScreenTextBox_Copy.Text = MakeCoordinateString(Settings.ScreenCenter);
+            this.centerOfScreenTextBox.Text = MakeCoordinateString(Settings.ScreenCenter);
         }
 
         private void SetWorldHopPointTexts()
@@ -154,14 +156,34 @@ namespace BetterClicker.Controls
         }
 
         public static string FilePath = "saveFile.json";
+        private static readonly object SaveLock = new object();
+        private static bool _isSaving = false;
 
         private async Task SaveFile()
         {
-            var text = JsonConvert.SerializeObject(MainWindow.AppModel, Formatting.Indented);
-            var path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, FilePath);
-            using (StreamWriter outputFile = new StreamWriter(path))
+            if (_isSaving) return;
+
+            try
             {
-                await outputFile.WriteAsync(text);
+                _isSaving = true;
+                var text = JsonConvert.SerializeObject(MainWindow.AppModel, Formatting.Indented);
+                var path = System.IO.Path.Combine(System.AppDomain.CurrentDomain.BaseDirectory, FilePath);
+
+                await Task.Run(() =>
+                {
+                    lock (SaveLock)
+                    {
+                        File.WriteAllText(path, text);
+                    }
+                });
+            }
+            catch (IOException)
+            {
+                // File is locked, ignore - will save on next opportunity
+            }
+            finally
+            {
+                _isSaving = false;
             }
         }
 
@@ -188,11 +210,11 @@ namespace BetterClicker.Controls
             this.CenterOfScreenPointReadActive = !CenterOfScreenPointReadActive;
             if (CenterOfScreenPointReadActive)
             {
-                setCenterOfScreenButton_Copy.Background = Brushes.Green;
+                setCenterOfScreenButton.Background = Brushes.Green;
             }
             else
             {
-                setCenterOfScreenButton_Copy.Background = Brushes.Gray;
+                setCenterOfScreenButton.Background = Brushes.Gray;
             }
         }  
 
@@ -250,6 +272,113 @@ namespace BetterClicker.Controls
                 Settings.WorldHopCount = worldCount;
                 await SaveFile();
             }
+        }
+
+        private void openScreenshotFolderButton_Click(object sender, RoutedEventArgs e)
+        {
+            var directory = System.AppDomain.CurrentDomain.BaseDirectory;
+            var screenshotPath = System.IO.Path.Combine(directory, "screenshots");
+
+            if (!Directory.Exists(screenshotPath))
+            {
+                Directory.CreateDirectory(screenshotPath);
+            }
+
+            Process.Start("explorer.exe", screenshotPath);
+        }
+
+        private void showInventoryButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAreaOverlay(Settings.InventoryLeftTop, Settings.InventoryRightBottom, "Inventory Area");
+        }
+
+        private void showConditionButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAreaOverlay(Settings.ConditionLeftTop, Settings.ConditionRightBottom, "Condition Area");
+        }
+
+        private void showWorldHopButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAreaOverlay(Settings.WorldHopLeftTop, Settings.WorldHopRightBottom, "World Hop Area");
+        }
+
+        private void showCenterButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (Settings.ScreenCenter == null)
+            {
+                MessageBox.Show("Center of screen not set", "Not Set", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            // Show a small crosshair at the center point
+            var point = Settings.ScreenCenter;
+            var size = 40;
+            var topLeft = new Models.Point(point.X - size / 2, point.Y - size / 2);
+            var bottomRight = new Models.Point(point.X + size / 2, point.Y + size / 2);
+            ShowAreaOverlay(topLeft, bottomRight, "Screen Center", true);
+        }
+
+        private void ShowAreaOverlay(Models.Point topLeft, Models.Point bottomRight, string title, bool isCrosshair = false)
+        {
+            if (topLeft == null || bottomRight == null)
+            {
+                MessageBox.Show($"{title} not set", "Not Set", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var overlayWindow = new Window
+            {
+                WindowStyle = WindowStyle.None,
+                AllowsTransparency = true,
+                Background = Brushes.Transparent,
+                Topmost = true,
+                ShowInTaskbar = false,
+                Left = topLeft.X,
+                Top = topLeft.Y,
+                Width = bottomRight.X - topLeft.X,
+                Height = bottomRight.Y - topLeft.Y
+            };
+
+            var border = new Border
+            {
+                BorderBrush = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)),
+                BorderThickness = new Thickness(3),
+                Background = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0))
+            };
+
+            if (isCrosshair)
+            {
+                var canvas = new Canvas();
+                var horizontalLine = new Line
+                {
+                    X1 = 0, Y1 = overlayWindow.Height / 2,
+                    X2 = overlayWindow.Width, Y2 = overlayWindow.Height / 2,
+                    Stroke = Brushes.Red, StrokeThickness = 2
+                };
+                var verticalLine = new Line
+                {
+                    X1 = overlayWindow.Width / 2, Y1 = 0,
+                    X2 = overlayWindow.Width / 2, Y2 = overlayWindow.Height,
+                    Stroke = Brushes.Red, StrokeThickness = 2
+                };
+                canvas.Children.Add(horizontalLine);
+                canvas.Children.Add(verticalLine);
+                border.Child = canvas;
+            }
+
+            overlayWindow.Content = border;
+            overlayWindow.MouseDown += (s, args) => overlayWindow.Close();
+
+            // Auto-close after 2 seconds
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            timer.Tick += (s, args) =>
+            {
+                timer.Stop();
+                overlayWindow.Close();
+            };
+            timer.Start();
+
+            overlayWindow.Show();
         }
     }
 }

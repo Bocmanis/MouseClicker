@@ -15,13 +15,13 @@ namespace BetterClicker.Models
         }
         public ObservableCollection<FullTask> FullTasks { get; set; }
         public string Name { get; set; }
-        public bool OnRepeat { get; set; }
+        public int RepeatCount { get; set; }
         public bool NoDelay { get; set; }
 
         public override string ToString()
         {
-            var repeatSymbol = OnRepeat ? "↺" : "1";
-            return $"{Name} ({repeatSymbol})";
+            var repeatSymbol = RepeatCount == 0 ? "1" : RepeatCount.ToString();
+            return $"{Name} (×{repeatSymbol})";
         }
     }
 }

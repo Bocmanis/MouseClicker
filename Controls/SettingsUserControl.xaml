@@ -1,45 +1,158 @@
-﻿<UserControl x:Class="BetterClicker.Controls.SettingsUserControl"
+<UserControl x:Class="BetterClicker.Controls.SettingsUserControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:local="clr-namespace:BetterClicker.Controls"
-             mc:Ignorable="d" 
+             mc:Ignorable="d"
              d:DesignHeight="516" d:DesignWidth="1016" Initialized="UserControl_Initialized" Background="#FFE8E8E8" BorderBrush="#FF444444">
-    <Grid KeyDown="Grid_KeyDown">
-        <Label x:Name="settingsLabel" Content="Settings" HorizontalAlignment="Left" Margin="12,2,0,0" VerticalAlignment="Top" Width="130"/>
-        <Label Content="Double Click Delay" HorizontalAlignment="Left" Margin="25,39,0,0" VerticalAlignment="Top" Width="135"/>
-        <TextBox x:Name="doubleClickTextBox" HorizontalAlignment="Left" Height="23" Margin="199,41,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="doubleClickTextBox_LostFocus"/>
-        <Label x:Name="___No_Name_" Content="LeftTopInventory" HorizontalAlignment="Left" Margin="26,75,0,0" VerticalAlignment="Top" Width="131"/>
-        <TextBox x:Name="leftTopInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="199,77,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Label Content="Right bottom inventory" HorizontalAlignment="Left" Margin="25,109,0,0" VerticalAlignment="Top" Width="145"/>
-        <TextBox x:Name="rightBottomInventoryTextBox" HorizontalAlignment="Left" Height="23" Margin="199,111,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Button x:Name="readInventoryButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="346,77,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readInventoryButton_Click" />
-        <Label Content="Inventory precision modifier" HorizontalAlignment="Left" Margin="25,146,0,0" VerticalAlignment="Top" Width="163"/>
-        <TextBox x:Name="inventoryPrecisionModifierTextBox" HorizontalAlignment="Left" Height="22" Margin="199,148,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
-        <Label Content="Center of screen" HorizontalAlignment="Left" Margin="27,180,0,0" VerticalAlignment="Top" Width="163"/>
-        <TextBox x:Name="centerOfScreenTextBox" HorizontalAlignment="Left" Height="22" Margin="201,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
-        <Button x:Name="setCenterOfScreenButton" Content="Set" HorizontalAlignment="Left" Margin="345,184,0,0" VerticalAlignment="Top" Width="55" Height="18" Click="setCenterOfScreenButton_Click" />
-        <Label Content="Center of screen" HorizontalAlignment="Left" Margin="27,180,0,0" VerticalAlignment="Top" Width="163"/>
-        <TextBox x:Name="centerOfScreenTextBox_Copy" HorizontalAlignment="Left" Height="22" Margin="201,182,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
-        <Button x:Name="setCenterOfScreenButton_Copy" Content="Set" HorizontalAlignment="Left" Margin="345,184,0,0" VerticalAlignment="Top" Width="55" Height="18" Click="setCenterOfScreenButton_Click" />
-        <Label x:Name="___No_Name__Copy" Content="ConditionLeftTop" HorizontalAlignment="Left" Margin="25,220,0,0" VerticalAlignment="Top" Width="131"/>
-        <TextBox x:Name="leftTopConditionTextBox" HorizontalAlignment="Left" Height="23" Margin="198,222,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Label Content="ConditionRightBottom" HorizontalAlignment="Left" Margin="24,254,0,0" VerticalAlignment="Top" Width="145"/>
-        <TextBox x:Name="rightBottomConditionTextBox" HorizontalAlignment="Left" Height="23" Margin="198,256,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Button x:Name="readConditionButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="345,222,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readConditionButton_Click" />
-        <Label Content="Min blob size" HorizontalAlignment="Left" Margin="25,290,0,0" VerticalAlignment="Top" Width="163"/>
-        <TextBox x:Name="minBlobSizeTextBox" HorizontalAlignment="Left" Height="22" Margin="197,290,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139" LostFocus="minBlobSizeTextBox_LostFocus"/>
-        <Label Content="Agility mode for colour" HorizontalAlignment="Left" Margin="20,320,0,0" VerticalAlignment="Top" Width="163"/>
-        <CheckBox x:Name="agilityModeCheckBox" Content="" HorizontalAlignment="Left" Margin="198,326,0,0" VerticalAlignment="Top" Height="35" Width="44" Click="agilityModeCheckBox_Changed"/>
-        <Button x:Name="takeScreenshotsButton" Content="Take screeshots&#xD;&#xA;" HorizontalAlignment="Left" Margin="830,28,0,0" VerticalAlignment="Top" Width="145" Height="44" Click="takeScreenshotsButton_Click" />
-        <Label x:Name="___No_Name__Copy1" Content="WolrdHopRightTop" HorizontalAlignment="Left" Margin="26,357,0,0" VerticalAlignment="Top" Width="131"/>
-        <TextBox x:Name="worldHopLeftTop_TextBox" HorizontalAlignment="Left" Height="23" Margin="199,359,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Label Content="WorldHopRightBottom" HorizontalAlignment="Left" Margin="25,391,0,0" VerticalAlignment="Top" Width="145"/>
-        <TextBox x:Name="worldHopRightBottom_TextBox" HorizontalAlignment="Left" Height="23" Margin="199,393,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="139"/>
-        <Button x:Name="readWorldHopButton" Content="Read &#xA;points" HorizontalAlignment="Left" Margin="346,359,0,0" VerticalAlignment="Top" Width="58" Height="58" Click="readWorldHopButton_Click" />
-        <Label Content="Wolrd Hop Count" HorizontalAlignment="Left" Margin="28,424,0,0" VerticalAlignment="Top" Width="134"/>
-        <TextBox x:Name="worldHopCountTextBox" HorizontalAlignment="Left" Height="24" Margin="199,425,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="138" LostFocus="worldHopCountTextBox_LostFocus" />
+    <Grid KeyDown="Grid_KeyDown" Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
+        <!-- Header and Screenshot buttons -->
+        <Label x:Name="settingsLabel" Content="Settings" FontSize="16" FontWeight="Bold" Grid.Row="0" Grid.Column="0"/>
+        <StackPanel Grid.Row="0" Grid.Column="2" VerticalAlignment="Top">
+            <Button x:Name="takeScreenshotsButton" Content="Take Screenshots" Width="120" Height="30" Margin="0,0,0,4" Click="takeScreenshotsButton_Click"/>
+            <Button x:Name="openScreenshotFolderButton" Content="Open Folder" Width="120" Height="26" Click="openScreenshotFolderButton_Click"/>
+        </StackPanel>
+
+        <!-- Row 1: Inventory Settings (left) and Condition Settings (right) -->
+        <Border BorderBrush="#FFCCCCCC" BorderThickness="1" Padding="10" Margin="0,0,8,8" Grid.Row="1" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="Inventory" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+                <Label Content="Left Top" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="leftTopInventoryTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <Label Content="Right Bottom" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="rightBottomInventoryTextBox" Grid.Row="2" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <Label Content="Precision" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="inventoryPrecisionModifierTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="8,0,0,0">
+                    <Button x:Name="readInventoryButton" Content="Read" Width="50" Height="22" Margin="0,0,0,2" Click="readInventoryButton_Click"/>
+                    <Button x:Name="showInventoryButton" Content="Show" Width="50" Height="22" Click="showInventoryButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border BorderBrush="#FFCCCCCC" BorderThickness="1" Padding="10" Margin="0,0,8,8" Grid.Row="1" Grid.Column="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="Condition" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+                <Label Content="Left Top" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="leftTopConditionTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <Label Content="Right Bottom" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="rightBottomConditionTextBox" Grid.Row="2" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="8,0,0,0">
+                    <Button x:Name="readConditionButton" Content="Read" Width="50" Height="22" Margin="0,0,0,2" Click="readConditionButton_Click"/>
+                    <Button x:Name="showConditionButton" Content="Show" Width="50" Height="22" Click="showConditionButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Row 2: World Hop (left) and Other Settings (right) -->
+        <Border BorderBrush="#FFCCCCCC" BorderThickness="1" Padding="10" Margin="0,0,8,8" Grid.Row="2" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="World Hop" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+                <Label Content="Left Top" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="worldHopLeftTop_TextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <Label Content="Right Bottom" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="worldHopRightBottom_TextBox" Grid.Row="2" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <Label Content="Count" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="worldHopCountTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="worldHopCountTextBox_LostFocus"/>
+
+                <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="8,0,0,0">
+                    <Button x:Name="readWorldHopButton" Content="Read" Width="50" Height="22" Margin="0,0,0,2" Click="readWorldHopButton_Click"/>
+                    <Button x:Name="showWorldHopButton" Content="Show" Width="50" Height="22" Click="showWorldHopButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <Border BorderBrush="#FFCCCCCC" BorderThickness="1" Padding="10" Margin="0,0,8,8" Grid.Row="2" Grid.Column="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="120"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="Other Settings" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+                <Label Content="Double Click Delay" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="doubleClickTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2" LostFocus="doubleClickTextBox_LostFocus"/>
+
+                <Label Content="Center of Screen" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="centerOfScreenTextBox" Grid.Row="2" Grid.Column="1" Height="22" Margin="0,2" LostFocus="inventoryPrecisionModifierTextBox_LostFocus"/>
+                <StackPanel Grid.Row="2" Grid.Column="2" Orientation="Horizontal" Margin="8,0,0,0">
+                    <Button x:Name="setCenterOfScreenButton" Content="Set" Width="40" Height="22" Margin="0,0,2,0" Click="setCenterOfScreenButton_Click"/>
+                    <Button x:Name="showCenterButton" Content="Show" Width="40" Height="22" Click="showCenterButton_Click"/>
+                </StackPanel>
+
+                <Label Content="Min Blob Size" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="minBlobSizeTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="minBlobSizeTextBox_LostFocus"/>
+
+                <Label Content="Agility Mode" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <CheckBox x:Name="agilityModeCheckBox" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Click="agilityModeCheckBox_Changed"/>
+            </Grid>
+        </Border>
     </Grid>
 </UserControl>
