@@ -9,8 +9,7 @@
     <Grid x:Name="mainGrid" Loaded="Grid_Loaded" KeyUp="mainGrid_KeyUp" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="200"/>
+            <RowDefinition Height="240"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
@@ -26,7 +25,7 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <ComboBox x:Name="overTaskDataGrid" IsEditable="True" Grid.Column="0" Height="26" Margin="0,0,8,0"/>
+            <ComboBox x:Name="overTaskDataGrid" Grid.Column="0" Height="26" Margin="0,0,8,0"/>
             <TextBox x:Name="overTaskNameTextBox" Grid.Column="1" Height="23" Width="150" Margin="0,0,8,0" LostFocus="overTaskNameTextBox_LostFocus"/>
             <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
                 <Label Content="Repeat:" Padding="0" VerticalAlignment="Center" Margin="0,0,4,0"/>
@@ -37,23 +36,8 @@
             <Button x:Name="saveConfigButton" Content="Save config" Grid.Column="5" Width="90" Height="26" Click="saveConfigButton_Click"/>
         </Grid>
 
-        <!-- Row 1: FullTask ComboBox and options -->
+        <!-- Row 1: FullTasks Grid and Controls -->
         <Grid Grid.Row="1" Margin="0,0,0,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-
-            <Label Content="Add from library:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,8,0"/>
-            <ComboBox x:Name="fullTaskComboBox" Grid.Column="1" Height="26" Margin="0,0,8,0"/>
-            <Button x:Name="addTaskFromComboBoxButton" Content="Add task" Grid.Column="2" Width="80" Height="26" Margin="0,0,8,0" Click="addTaskFromComboBoxButton_Click"/>
-            <CheckBox x:Name="doWithoutDelayCheckbox" Content="No delay" Grid.Column="3" VerticalAlignment="Center" Checked="doWithoutDelayCheckbox_Checked"/>
-        </Grid>
-
-        <!-- Row 2: FullTasks Grid and Controls -->
-        <Grid Grid.Row="2" Margin="0,0,0,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*"/>
                 <ColumnDefinition Width="Auto"/>
@@ -64,6 +48,7 @@
 
             <StackPanel Grid.Column="1" Orientation="Vertical" Width="120" Margin="0,0,8,0">
                 <Button x:Name="addNewButtonName" Content="Add empty task" Height="28" Margin="0,0,0,4" Click="addNewButtonName_Click"/>
+                <Button x:Name="insertTaskAboveButton" Content="Insert above" Height="28" Margin="0,0,0,4" Click="insertTaskAbove_Click" ToolTip="Insert new task above selected"/>
                 <Button x:Name="copyTaskButton" Content="Copy task" Height="28" Margin="0,0,0,4" Click="copyTaskButton_Click"/>
                 <Button x:Name="startTaskButton" Content="Start" Height="40" Margin="0,0,0,4" Click="startTaskButton_Click" Background="#FF90EE90"/>
                 <Button Content="Stop" Height="80" Click="Button_Click" Background="#FFFF6B6B"/>
@@ -74,8 +59,8 @@
             </Border>
         </Grid>
 
-        <!-- Row 3: Search and MouseAction controls -->
-        <Grid Grid.Row="3" Margin="0,0,0,8">
+        <!-- Row 2: Search and MouseAction controls -->
+        <Grid Grid.Row="2" Margin="0,0,0,8">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="200"/>
@@ -89,11 +74,14 @@
             <TextBox x:Name="overTaskNameSearchBox" Grid.Column="1" Height="23" Margin="0,0,16,0"
                      TextInput="overTaskNameSearchBox_TextInput" TextChanged="overTaskNameSearchBox_TextChanged"/>
             <Label Content="C: base point, V: rectangle point" Grid.Column="2" VerticalAlignment="Center" Foreground="Gray"/>
-            <Button x:Name="addMouseActionButton" Content="Add action" Grid.Column="3" Width="90" Height="26" Margin="0,0,8,0" Click="addMouseActionButton_Click"/>
+            <StackPanel Grid.Column="3" Orientation="Horizontal">
+                <Button x:Name="addMouseActionButton" Content="Add action" Width="90" Height="26" Margin="0,0,4,0" Click="addMouseActionButton_Click"/>
+                <Button x:Name="insertMouseActionAboveButton" Content="Insert above" Width="90" Height="26" Margin="0,0,8,0" Click="insertMouseActionAbove_Click" ToolTip="Insert action above selected"/>
+            </StackPanel>
             <TextBlock x:Name="waitTimeLogBox" Grid.Column="4" Width="100" VerticalAlignment="Center" TextWrapping="Wrap"/>
         </Grid>
 
-        <!-- Row 4: MouseActions DataGrid -->
-        <DataGrid x:Name="mouseActionsDataGrid" Grid.Row="4" AutoGeneratingColumn="mouseActionsDataGrid_AutoGeneratingColumn" AutoGeneratedColumns="mouseActionsDataGrid_AutoGeneratedColumns"/>
+        <!-- Row 3: MouseActions DataGrid -->
+        <DataGrid x:Name="mouseActionsDataGrid" Grid.Row="3" AutoGeneratingColumn="mouseActionsDataGrid_AutoGeneratingColumn" AutoGeneratedColumns="mouseActionsDataGrid_AutoGeneratedColumns"/>
     </Grid>
 </UserControl>
