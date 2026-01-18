@@ -29,8 +29,6 @@ namespace BetterClicker.Models
         public string IgnoreInvSpaces { get; set; }
         public List<int> IgnoreInvSpacesList { get; set; }
 
-        [DisplayName("Pub")]
-        public bool IsPublic { get; set; }
         public override string ToString()
         {
             return Name;
