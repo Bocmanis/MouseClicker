@@ -339,31 +339,57 @@ namespace BetterClicker.Logic
 
         private Point GetWorldHopPoint(MouseActionModel task)
         {
-            var spot = 0;
-            if (WorldHopIncreaser.ContainsKey(task.TotallyNormalName))
+            var worldCount = MainWindow.AppModel.Settings.WorldHopCount;
+            var worldHopLeftTop = MainWindow.AppModel.Settings.WorldHopLeftTop;
+            var worldHopRightBottom = MainWindow.AppModel.Settings.WorldHopRightBottom;
+
+            if (worldCount <= 0 || worldHopLeftTop == null || worldHopRightBottom == null)
             {
-                spot = WorldHopIncreaser[task.TotallyNormalName];
+                OnInfoChanged("WorldHop settings not configured properly. Please set WorldHopCount, WorldHopLeftTop, and WorldHopRightBottom in settings.", new EventArgs());
+                return new Point(0, 0);
+            }
+
+            var taskName = string.IsNullOrEmpty(task.TotallyNormalName) ? CurrentOverTask.Name : task.TotallyNormalName;
+
+            var spot = 0;
+            if (WorldHopIncreaser.ContainsKey(taskName))
+            {
+                spot = WorldHopIncreaser[taskName];
             }
             else
             {
-                WorldHopIncreaser.Add(task.TotallyNormalName, spot);
+                WorldHopIncreaser.Add(taskName, spot);
             }
-            var worldCount = MainWindow.AppModel.Settings.WorldHopCount;
             var row = spot % worldCount;
 
-            var leftTopX = MainWindow.AppModel.Settings.WorldHopLeftTop.X;
-            var leftTopY = MainWindow.AppModel.Settings.WorldHopLeftTop.Y;
-            var rightBotX = MainWindow.AppModel.Settings.WorldHopRightBottom.X;
-            var rightBotY = MainWindow.AppModel.Settings.WorldHopRightBottom.Y;
+            var leftTopX = worldHopLeftTop.X;
+            var leftTopY = worldHopLeftTop.Y;
+            var rightBotX = worldHopRightBottom.X;
+            var rightBotY = worldHopRightBottom.Y;
 
             decimal verticalIncrement = (rightBotY - leftTopY) / (decimal)worldCount;
             var precision = (int)Math.Round(verticalIncrement / 3, 0);
-            var pointX = Random.Next(precision + leftTopX, -precision + rightBotX);
+
+            var minX = precision + leftTopX;
+            var maxX = -precision + rightBotX;
+            if (minX >= maxX)
+            {
+                minX = leftTopX;
+                maxX = rightBotX;
+            }
+            var pointX = minX < maxX ? Random.Next(minX, maxX) : minX;
+
             var yLeftTop = (int)Math.Round(precision + row * verticalIncrement + leftTopY);
             var yRightBottom = (int)Math.Round(-precision + leftTopY + verticalIncrement * (row + 1));
-            var pointY = Random.Next(yLeftTop, yRightBottom);
+            if (yLeftTop >= yRightBottom)
+            {
+                yLeftTop = leftTopY + (int)(row * verticalIncrement);
+                yRightBottom = leftTopY + (int)((row + 1) * verticalIncrement);
+            }
+            var pointY = yLeftTop < yRightBottom ? Random.Next(yLeftTop, yRightBottom) : yLeftTop;
+
             spot++;
-            WorldHopIncreaser[task.TotallyNormalName] = spot;
+            WorldHopIncreaser[taskName] = spot;
             return new Point(pointX, pointY);
         }
 
