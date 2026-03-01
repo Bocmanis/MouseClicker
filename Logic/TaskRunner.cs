@@ -54,6 +54,7 @@ namespace BetterClicker.Logic
                 }
                 catch (Exception ex)
                 {
+                    DoStop = true;
                     OnInfoChanged($"Task execution failed. Message: {ex.Message}", new EventArgs());
                 }
             }
@@ -81,6 +82,9 @@ namespace BetterClicker.Logic
         private void DoOverTask(OverTask overTask)
         {
             CurrentOverTask = overTask;
+            // Reset all counts at the start of each overtask iteration
+            // Remember only persists counts within fulltask repeats, not across overtask repeats
+            MouseActionIncreaser.Clear();
             foreach (var fullTask in overTask.FullTasks)
             {
                 CurrentFullTask = fullTask;
@@ -127,7 +131,16 @@ namespace BetterClicker.Logic
             }
             else
             {
-                fullTask.IgnoreInvSpacesList = fullTask.IgnoreInvSpaces.Split(',').Select(x => int.Parse(x)).ToList();
+                try
+                {
+                    fullTask.IgnoreInvSpacesList = fullTask.IgnoreInvSpaces.Split(',').Select(x => int.Parse(x.Trim())).ToList();
+                }
+                catch (Exception ex)
+                {
+                    DoStop = true;
+                    OnInfoChanged($"Failed to parse Skip value '{fullTask.IgnoreInvSpaces}' in fulltask '{fullTask.Name}'. Expected comma-separated numbers. Error: {ex.Message}", new EventArgs());
+                    return;
+                }
             }
 
             OnInfoChanged($"Starting {fullTask.Name}", new EventArgs());
@@ -151,26 +164,31 @@ namespace BetterClicker.Logic
 
                 CurrentMouseAction = task;
 
+                var isUntilColor = task.CheckCondition == ConditionType.UntilHasGreen || task.CheckCondition == ConditionType.UntilHasRed;
+
                 KeyBoardDown(task.ClickKey);
-                if (task.RepTimes == 0)
+                do
                 {
-                    this.MouseActionCounterText = "1/1";
-                    OnInfoChanged($"Doing single task: {task.TotallyNormalName}", new EventArgs());
-                    DoClick(task);
-                }
-                else
-                {
-                    for (int i = 0; i < task.RepTimes; i++)
+                    if (task.RepTimes == 0)
                     {
-                        if (DoStop)
-                        {
-                            return;
-                        }
-                        this.MouseActionCounterText = $"{i + 1}/{task.RepTimes}";
-                        OnInfoChanged($"Doing rep task: {task.TotallyNormalName}", new EventArgs());
+                        this.MouseActionCounterText = "1/1";
+                        OnInfoChanged($"Doing single task: {task.TotallyNormalName}", new EventArgs());
                         DoClick(task);
                     }
-                }
+                    else
+                    {
+                        for (int i = 0; i < task.RepTimes; i++)
+                        {
+                            if (DoStop)
+                            {
+                                return;
+                            }
+                            this.MouseActionCounterText = $"{i + 1}/{task.RepTimes}";
+                            OnInfoChanged($"Doing rep task: {task.TotallyNormalName}", new EventArgs());
+                            DoClick(task);
+                        }
+                    }
+                } while (isUntilColor && !DoStop && !IsUntilColorMet(task));
 
                 KeyboardUp(task.ClickKey);
 
@@ -212,6 +230,8 @@ namespace BetterClicker.Logic
                     var isSamePictures4 = ImageProcessor.IsConditionMet(topLeft2, bottomRight2);
                     result = isSamePictures4;
                     break;
+                case ConditionType.UntilHasGreen:
+                case ConditionType.UntilHasRed:
                 case ConditionType.None:
                 default:
                     result = true;
@@ -231,6 +251,16 @@ namespace BetterClicker.Logic
                 return IsConditionMet(task, tryCount);
             }
             return result;
+        }
+
+        private bool IsUntilColorMet(MouseActionModel task)
+        {
+            bool isGreen = task.CheckCondition == ConditionType.UntilHasGreen;
+            var scanTopLeft = new Point(Math.Min(task.PointX, task.RcPtX), Math.Min(task.PointY, task.RcPtY));
+            var scanBottomRight = new Point(Math.Max(task.PointX, task.RcPtX), Math.Max(task.PointY, task.RcPtY));
+            var hasColor = ImageProcessor.HasColorInRegion(scanTopLeft, scanBottomRight, isGreen);
+            OnInfoChanged($"UntilHas{(isGreen ? "Green" : "Red")}: color {(hasColor ? "found" : "not found")}, {(hasColor ? "proceeding" : "repeating")}", new EventArgs());
+            return hasColor;
         }
 
         private async void DoClick(MouseActionModel task)
@@ -285,7 +315,12 @@ namespace BetterClicker.Logic
                 case ActionType.ClickRedBox:
                 case ActionType.ClickGreenBox:
                     var swa = Stopwatch.StartNew();
-                    var colourPoint = ImageProcessor.GetColouredBoxPoint(task.ActionType);
+                    Models.Point overrideCenter = null;
+                    if (task.ActionType == ActionType.ClickNearestToCenterColBox && task.PointX != 0)
+                    {
+                        overrideCenter = new Point(task.PointX, task.PointY);
+                    }
+                    var colourPoint = ImageProcessor.GetColouredBoxPoint(task.ActionType, overrideCenter);
                     if (colourPoint.X == 0)
                     {
                         colourPoint = GetPoint(task);

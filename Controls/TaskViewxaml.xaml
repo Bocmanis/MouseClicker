@@ -14,27 +14,46 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Row 0: OverTask Selection -->
-        <Grid Grid.Row="0" Margin="0,0,0,8">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
+        <!-- Row 0: Search and OverTask Selection -->
+        <StackPanel Grid.Row="0" Margin="0,0,0,8">
+            <Grid Margin="0,0,0,4">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Label Content="Search:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,4,0" Padding="0"/>
+                <TextBox x:Name="overTaskNameSearchBox" Grid.Column="1" Height="23"
+                         TextChanged="overTaskNameSearchBox_TextChanged"/>
+                <Popup x:Name="searchResultsPopup" PlacementTarget="{Binding ElementName=overTaskNameSearchBox}"
+                       Placement="Bottom" StaysOpen="False" AllowsTransparency="True"
+                       Width="{Binding ActualWidth, ElementName=overTaskNameSearchBox}">
+                    <Border Background="White" BorderBrush="Gray" BorderThickness="1">
+                        <ListBox x:Name="searchResultsListBox" MaxHeight="200"
+                                 SelectionChanged="searchResultsListBox_SelectionChanged"/>
+                    </Border>
+                </Popup>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
 
-            <ComboBox x:Name="overTaskDataGrid" Grid.Column="0" Height="26" Margin="0,0,8,0"/>
-            <TextBox x:Name="overTaskNameTextBox" Grid.Column="1" Height="23" Width="150" Margin="0,0,8,0" LostFocus="overTaskNameTextBox_LostFocus"/>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
-                <Label Content="Repeat:" Padding="0" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                <TextBox x:Name="repeatCountTextBox" Height="23" Width="40" LostFocus="repeatCountTextBox_LostFocus" PreviewTextInput="repeatCountTextBox_PreviewTextInput" VerticalAlignment="Center"/>
-            </StackPanel>
-            <Button Content="+" Grid.Column="3" Width="30" Height="26" Margin="0,0,4,0" Click="Button_Click_1" ToolTip="Add new OverTask"/>
-            <Button x:Name="deleteOvertaskButton" Content="X" Grid.Column="4" Width="30" Height="26" Margin="0,0,8,0" Click="deleteOvertaskButton_Click" ToolTip="Delete OverTask"/>
-            <Button x:Name="saveConfigButton" Content="Save config" Grid.Column="5" Width="90" Height="26" Click="saveConfigButton_Click"/>
-        </Grid>
+                <ComboBox x:Name="overTaskDataGrid" Grid.Column="0" Height="26" Margin="0,0,8,0"/>
+                <TextBox x:Name="overTaskNameTextBox" Grid.Column="1" Height="23" Width="150" Margin="0,0,8,0" LostFocus="overTaskNameTextBox_LostFocus"/>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
+                    <Label Content="Repeat:" Padding="0" VerticalAlignment="Center" Margin="0,0,4,0"/>
+                    <TextBox x:Name="repeatCountTextBox" Height="23" Width="40" LostFocus="repeatCountTextBox_LostFocus" PreviewTextInput="repeatCountTextBox_PreviewTextInput" VerticalAlignment="Center"/>
+                </StackPanel>
+                <Button Content="+" Grid.Column="3" Width="30" Height="26" Margin="0,0,4,0" Click="Button_Click_1" ToolTip="Add new OverTask"/>
+                <Button x:Name="deleteOvertaskButton" Content="X" Grid.Column="4" Width="30" Height="26" Margin="0,0,8,0" Click="deleteOvertaskButton_Click" ToolTip="Delete OverTask"/>
+                <Button x:Name="saveConfigButton" Content="Save config" Grid.Column="5" Width="90" Height="26" Click="saveConfigButton_Click"/>
+            </Grid>
+        </StackPanel>
 
         <!-- Row 1: FullTasks Grid and Controls -->
         <Grid Grid.Row="1" Margin="0,0,0,8">
@@ -59,26 +78,20 @@
             </Border>
         </Grid>
 
-        <!-- Row 2: Search and MouseAction controls -->
+        <!-- Row 2: MouseAction controls -->
         <Grid Grid.Row="2" Margin="0,0,0,8">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="200"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Label Content="Search:" Grid.Column="0" VerticalAlignment="Center" Margin="0,0,4,0"/>
-            <TextBox x:Name="overTaskNameSearchBox" Grid.Column="1" Height="23" Margin="0,0,16,0"
-                     TextInput="overTaskNameSearchBox_TextInput" TextChanged="overTaskNameSearchBox_TextChanged"/>
-            <Label Content="C: base point, V: rectangle point" Grid.Column="2" VerticalAlignment="Center" Foreground="Gray"/>
-            <StackPanel Grid.Column="3" Orientation="Horizontal">
+            <Label Content="C: base point, V: rectangle point" Grid.Column="0" VerticalAlignment="Center" Foreground="Gray"/>
+            <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button x:Name="addMouseActionButton" Content="Add action" Width="90" Height="26" Margin="0,0,4,0" Click="addMouseActionButton_Click"/>
                 <Button x:Name="insertMouseActionAboveButton" Content="Insert above" Width="90" Height="26" Margin="0,0,8,0" Click="insertMouseActionAbove_Click" ToolTip="Insert action above selected"/>
             </StackPanel>
-            <TextBlock x:Name="waitTimeLogBox" Grid.Column="4" Width="100" VerticalAlignment="Center" TextWrapping="Wrap"/>
+            <TextBlock x:Name="waitTimeLogBox" Grid.Column="2" Width="100" VerticalAlignment="Center" TextWrapping="Wrap"/>
         </Grid>
 
         <!-- Row 3: MouseActions DataGrid -->

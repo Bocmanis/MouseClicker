@@ -770,31 +770,33 @@ namespace BetterClicker.Controls
             overTaskDataGrid.SelectedItem = OverTasks.CurrentItem;
         }
 
-        private void overTaskNameSearchBox_TextInput(object sender, TextCompositionEventArgs e)
-        {
-
-        }
-
         private void overTaskNameSearchBox_TextChanged(object sender, TextChangedEventArgs e)
         {
-            var textBox = e.OriginalSource as TextBox;
-            var text = textBox.Text;
+            var text = overTaskNameSearchBox.Text;
 
-            OverTasks.Filter = x =>
+            if (text.Length < 3)
             {
-                if (string.IsNullOrEmpty(text))
-                    return true;
+                searchResultsPopup.IsOpen = false;
+                return;
+            }
 
-                OverTask task = x as OverTask;
+            var filtered = OverTaskSource
+                .Where(x => x.Name.Contains(text, StringComparison.OrdinalIgnoreCase))
+                .ToList();
 
-                return task.Name.Contains(text, StringComparison.OrdinalIgnoreCase);
-            };
-            overTaskDataGrid.IsDropDownOpen = true;
-            Dispatcher.BeginInvoke(new Action(() =>
-            {
-                overTaskNameSearchBox.Focus();
-                overTaskNameSearchBox.CaretIndex = overTaskNameSearchBox.Text.Length;
-            }), DispatcherPriority.Input);
+            searchResultsListBox.ItemsSource = filtered;
+            searchResultsListBox.DisplayMemberPath = "Name";
+            searchResultsPopup.IsOpen = filtered.Count > 0;
+        }
+
+        private void searchResultsListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var selected = searchResultsListBox.SelectedItem as OverTask;
+            if (selected == null) return;
+
+            overTaskDataGrid.SelectedItem = selected;
+            searchResultsPopup.IsOpen = false;
+            overTaskNameSearchBox.Clear();
         }
 
         private async void copyTaskButton_Click(object sender, RoutedEventArgs e)

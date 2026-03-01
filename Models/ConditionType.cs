@@ -7,5 +7,7 @@
         GlobalIfSame,
         Local,
         LocalIfSame,
+        UntilHasGreen,
+        UntilHasRed,
     }
 }

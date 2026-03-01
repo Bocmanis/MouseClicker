@@ -41,10 +41,10 @@ namespace BetterClicker.Logic
             this.Random = new Random(DateTime.Now.Millisecond);
         }
 
-        public Models.Point GetColouredBoxPoint(ActionType actionType)
+        public Models.Point GetColouredBoxPoint(ActionType actionType, Models.Point overrideCenter = null)
         {
             // locating objects
-            var centerPoint = FindBlobs(actionType);
+            var centerPoint = FindBlobs(actionType, overrideCenter);
             return centerPoint;
         }
 
@@ -76,7 +76,7 @@ namespace BetterClicker.Logic
             }
         }
 
-        public Models.Point FindBlobs(ActionType actionType)
+        public Models.Point FindBlobs(ActionType actionType, Models.Point overrideCenter = null)
         {
             switch (actionType)
             {
@@ -164,7 +164,7 @@ namespace BetterClicker.Logic
                 case ActionType.ClickBiggestColBox:
                     return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
                 case ActionType.ClickNearestToCenterColBox:
-                    return GetClosestToCenterBlob(image, blobCounter, blobs);
+                    return GetClosestToCenterBlob(image, blobCounter, blobs, overrideCenter);
                 default:
                     return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
             }
@@ -232,6 +232,15 @@ namespace BetterClicker.Logic
             blobCounter.FilterBlobs = true;
             blobCounter.MinHeight = Settings.MinBlobSize ?? 40;
             blobCounter.MinWidth = Settings.MinBlobSize ?? 40;
+            return blobCounter;
+        }
+
+        private BlobCounter GetTinyBlobCounter()
+        {
+            BlobCounter blobCounter = new BlobCounter();
+            blobCounter.FilterBlobs = true;
+            blobCounter.MinHeight = 1;
+            blobCounter.MinWidth = 1;
             return blobCounter;
         }
 
@@ -343,9 +352,9 @@ namespace BetterClicker.Logic
             }
             return new Models.Point(0, 0);
         }
-        private Models.Point GetClosestToCenterBlob(Bitmap image, BlobCounter blobCounter, Blob[] blobs)
+        private Models.Point GetClosestToCenterBlob(Bitmap image, BlobCounter blobCounter, Blob[] blobs, Models.Point overrideCenter = null)
         {
-            Blob closestBlob = GetClosestToCenterBlobBlob(blobs);
+            Blob closestBlob = GetClosestToCenterBlobBlob(blobs, overrideCenter);
             if (closestBlob != null)
             {
                 return GetPointFromEdgeToCenter(blobCounter, closestBlob);
@@ -353,9 +362,12 @@ namespace BetterClicker.Logic
             return new Models.Point(0, 0);
         }
 
-        private Blob GetClosestToCenterBlobBlob(Blob[] blobs)
+        private Blob GetClosestToCenterBlobBlob(Blob[] blobs, Models.Point overrideCenter = null)
         {
-            var centerPoint = new AForge.Point(Settings.ScreenCenter.X, Settings.ScreenCenter.Y);
+            var center = overrideCenter != null && overrideCenter.X != 0
+                ? overrideCenter
+                : Settings.ScreenCenter;
+            var centerPoint = new AForge.Point(center.X, center.Y);
             var closestBlob = blobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
             return closestBlob;
         }
@@ -381,6 +393,23 @@ namespace BetterClicker.Logic
             var resultY = point.Y - yDelta;
 
             return new Models.Point((int)resultX, (int)resultY);
+        }
+
+        public bool HasColorInRegion(Models.Point topLeft, Models.Point bottomRight, bool searchGreen)
+        {
+            var rectangle = GetConditionRectangle(topLeft, bottomRight);
+            Bitmap image = GetScreenshot(rectangle);
+
+            if (searchGreen)
+                FilterOutGreenBlobs(image);
+            else
+                FilterOutRedBlobs(image);
+
+            BlobCounter blobCounter = GetTinyBlobCounter();
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+             
+            return blobs.Length > 0;
         }
 
         internal Models.Point SearchForGreen(int searchDelay, CancellationToken token)
