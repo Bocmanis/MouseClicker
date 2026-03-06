@@ -491,255 +491,127 @@ namespace BetterClicker.Controls
             ShowActionPreview(mouseAction);
         }
 
+        private static bool IsColorAction(ActionType actionType)
+        {
+            return actionType == ActionType.ClickRedBox ||
+                   actionType == ActionType.ClickGreenBox ||
+                   actionType == ActionType.ClickBiggestColBox ||
+                   actionType == ActionType.ClickNearestToCenterColBox ||
+                   actionType == ActionType.QuickGreenBox ||
+                   actionType == ActionType.FindGreens;
+        }
+
         private void ShowActionPreview(MouseActionModel action)
         {
+            if (IsColorAction(action.ActionType))
+            {
+                ShowColorActionPreview(action);
+                return;
+            }
+
             int x = action.PointX;
             int y = action.PointY;
             int x2 = action.RcPtX;
             int y2 = action.RcPtY;
 
-            // Determine the area to capture
-            int left, top, width, height;
-            bool isColorAction = action.ActionType == ActionType.ClickRedBox ||
-                                 action.ActionType == ActionType.ClickGreenBox ||
-                                 action.ActionType == ActionType.ClickBiggestColBox ||
-                                 action.ActionType == ActionType.ClickNearestToCenterColBox ||
-                                 action.ActionType == ActionType.QuickGreenBox ||
-                                 action.ActionType == ActionType.FindGreens;
-
-            if (x2 > 0 && y2 > 0)
+            if (x > 0 && y > 0 && x2 > 0 && y2 > 0)
             {
-                // Rectangle defined
-                left = Math.Min(x, x2);
-                top = Math.Min(y, y2);
-                width = Math.Abs(x2 - x);
-                height = Math.Abs(y2 - y);
-            }
-            else if (isColorAction)
-            {
-                // Color actions scan the full screen
-                left = 0;
-                top = 0;
-                width = (int)SystemParameters.PrimaryScreenWidth;
-                height = (int)SystemParameters.PrimaryScreenHeight;
+                int left = Math.Min(x, x2);
+                int top = Math.Min(y, y2);
+                int right = Math.Max(x, x2);
+                int bottom = Math.Max(y, y2);
+                ShowAreaOverlay(left, top, right, bottom, $"{action.ActionType}");
             }
             else if (x > 0 && y > 0)
             {
-                // Single point - show 100x100 area around it
-                left = x - 50;
-                top = y - 50;
-                width = 100;
-                height = 100;
+                int size = 40;
+                ShowAreaOverlay(x - size / 2, y - size / 2, x + size / 2, y + size / 2, $"{action.ActionType}", isCrosshair: true);
             }
             else
             {
-                // No coordinates - capture center of screen
-                left = (int)(SystemParameters.PrimaryScreenWidth / 2) - 150;
-                top = (int)(SystemParameters.PrimaryScreenHeight / 2) - 150;
-                width = 300;
-                height = 300;
-            }
-
-            // Ensure valid dimensions
-            left = Math.Max(0, left);
-            top = Math.Max(0, top);
-            width = Math.Max(50, width);
-            height = Math.Max(50, height);
-
-            try
-            {
-                // Capture screenshot
-                var bitmap = new System.Drawing.Bitmap(width, height);
-                using (var g = System.Drawing.Graphics.FromImage(bitmap))
-                {
-                    g.CopyFromScreen(left, top, 0, 0, new System.Drawing.Size(width, height));
-                }
-
-                // For color actions, highlight the blobs
-                int blobCount = 0;
-                if (isColorAction)
-                {
-                    // Save original for debugging
-                    var screenshotDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "screenshots");
-                    if (!Directory.Exists(screenshotDir))
-                        Directory.CreateDirectory(screenshotDir);
-                    bitmap.Save(System.IO.Path.Combine(screenshotDir, "preview_original.png"));
-
-                    blobCount = HighlightColorBlobs(bitmap, action.ActionType);
-
-                    // Save processed for debugging
-                    bitmap.Save(System.IO.Path.Combine(screenshotDir, "preview_highlighted.png"));
-                }
-
-                // Draw crosshair at click point if single point
-                if (x > 0 && y > 0 && (x2 == 0 || y2 == 0))
-                {
-                    using (var g = System.Drawing.Graphics.FromImage(bitmap))
-                    {
-                        var pen = new System.Drawing.Pen(System.Drawing.Color.Yellow, 2);
-                        int cx = x - left;
-                        int cy = y - top;
-                        g.DrawLine(pen, cx - 10, cy, cx + 10, cy);
-                        g.DrawLine(pen, cx, cy - 10, cx, cy + 10);
-                    }
-                }
-
-                // Show in a popup window
-                ShowPreviewWindow(bitmap, action, left, top, isColorAction, blobCount);
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"Could not capture preview: {ex.Message}", "Preview Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                MessageBox.Show("No coordinates set for this action.", "Not Set", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
 
-        private int HighlightColorBlobs(System.Drawing.Bitmap bitmap, ActionType actionType)
+        private void ShowColorActionPreview(MouseActionModel action)
         {
-            int blobCount = 0;
-            try
+            var imageProcessor = new Logic.ImageProcessingLogic();
+            var blobRect = imageProcessor.GetBiggestBlobRectangle(action.ActionType);
+
+            if (blobRect == null)
             {
-                // Convert to 24bpp RGB format for AForge
-                System.Drawing.Bitmap processBitmap = new System.Drawing.Bitmap(bitmap.Width, bitmap.Height, System.Drawing.Imaging.PixelFormat.Format24bppRgb);
-                using (var g = System.Drawing.Graphics.FromImage(processBitmap))
-                {
-                    g.DrawImage(bitmap, 0, 0, bitmap.Width, bitmap.Height);
-                }
-
-                // Apply color filter based on action type
-                if (actionType == ActionType.ClickRedBox)
-                {
-                    var filter = new AForge.Imaging.Filters.ColorFiltering();
-                    filter.Red = new AForge.IntRange(140, 255);
-                    filter.Green = new AForge.IntRange(0, 60);
-                    filter.Blue = new AForge.IntRange(140, 255);
-                    filter.ApplyInPlace(processBitmap);
-                }
-                else
-                {
-                    var filter = new AForge.Imaging.Filters.YCbCrFiltering();
-                    filter.Cb = new AForge.Range(-0.7f, -0.2f);
-                    filter.Cr = new AForge.Range(-0.7f, -0.2f);
-                    filter.ApplyInPlace(processBitmap);
-                }
-
-                // Save filtered image for debugging
-                var screenshotDir = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "screenshots");
-                processBitmap.Save(System.IO.Path.Combine(screenshotDir, "preview_filtered.png"));
-
-                // Find blobs - use settings MinBlobSize or default to 10 for preview
-                var blobCounter = new AForge.Imaging.BlobCounter();
-                blobCounter.FilterBlobs = true;
-                int minSize = MainWindow.AppModel?.Settings?.MinBlobSize ?? 10;
-                // Use smaller size for preview to be more sensitive
-                blobCounter.MinHeight = Math.Max(5, minSize / 2);
-                blobCounter.MinWidth = Math.Max(5, minSize / 2);
-                blobCounter.ProcessImage(processBitmap);
-                var blobs = blobCounter.GetObjectsInformation();
-                blobCount = blobs.Length;
-
-                // Draw rectangles on original bitmap
-                using (var g = System.Drawing.Graphics.FromImage(bitmap))
-                {
-                    // Black and white pens for visibility on any background
-                    var blackPen = new System.Drawing.Pen(System.Drawing.Color.Black, 5);
-                    var whitePen = new System.Drawing.Pen(System.Drawing.Color.White, 3);
-
-                    foreach (var blob in blobs)
-                    {
-                        // Draw black outline first (thicker)
-                        g.DrawRectangle(blackPen, blob.Rectangle);
-                        // Draw white outline on top (thinner)
-                        g.DrawRectangle(whitePen, blob.Rectangle);
-
-                        // Draw blob info with background
-                        var font = new System.Drawing.Font("Arial", 12, System.Drawing.FontStyle.Bold);
-                        var text = $"{blob.Area}px";
-                        var textSize = g.MeasureString(text, font);
-
-                        // Background for text
-                        g.FillRectangle(System.Drawing.Brushes.Black,
-                            blob.Rectangle.X, blob.Rectangle.Y - 20, textSize.Width + 4, textSize.Height);
-                        g.DrawString(text, font, System.Drawing.Brushes.White, blob.Rectangle.X + 2, blob.Rectangle.Y - 18);
-                    }
-
-                    // If no blobs found, draw warning text
-                    if (blobCount == 0)
-                    {
-                        var font = new System.Drawing.Font("Arial", 100, System.Drawing.FontStyle.Bold);
-                        var text = "No blobs detected!";
-                        var textSize = g.MeasureString(text, font);
-                        var x = (bitmap.Width - textSize.Width) / 2;
-                        var y = (bitmap.Height - textSize.Height) / 2;
-
-                        // Draw background for text
-                        g.FillRectangle(new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(180, 0, 0, 0)),
-                            x - 10, y - 5, textSize.Width + 20, textSize.Height + 10);
-                        g.DrawString(text, font, System.Drawing.Brushes.Red, x, y);
-                    }
-                    else
-                    {
-                        // Draw summary at top
-                        var font = new System.Drawing.Font("Arial", 16, System.Drawing.FontStyle.Bold);
-                        var largestBlob = blobs.OrderByDescending(b => b.Area).First();
-                        var text = $"Found {blobCount} blob(s). Largest: {largestBlob.Area}px at ({largestBlob.Rectangle.X}, {largestBlob.Rectangle.Y})";
-                        g.FillRectangle(new System.Drawing.SolidBrush(System.Drawing.Color.FromArgb(200, 0, 0, 0)), 0, 0, bitmap.Width, 30);
-                        g.DrawString(text, font, System.Drawing.Brushes.Yellow, 10, 5);
-                    }
-                }
-
-                processBitmap.Dispose();
+                MessageBox.Show("No blob detected on screen.", "Not Found", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
             }
-            catch
-            {
-                // Ignore blob detection errors
-            }
-            return blobCount;
+
+            var rect = blobRect.Value;
+            ShowAreaOverlay(rect.Left, rect.Top, rect.Right, rect.Bottom, $"{action.ActionType}", useWhiteBorder: true);
         }
 
-        private void ShowPreviewWindow(System.Drawing.Bitmap bitmap, MouseActionModel action, int screenX, int screenY, bool isColorAction = false, int blobCount = 0)
+        private void ShowAreaOverlay(int left, int top, int right, int bottom, string title, bool isCrosshair = false, bool useWhiteBorder = false)
         {
-            string title = $"Preview: {action.ActionType} at ({screenX}, {screenY})";
-            if (isColorAction)
+            var overlayWindow = new Window
             {
-                title += blobCount > 0 ? $" - {blobCount} blob(s) found" : " - NO BLOBS FOUND!";
-            }
-
-            var previewWindow = new Window
-            {
-                Title = title,
-                Width = Math.Min(bitmap.Width + 40, 800),
-                Height = Math.Min(bitmap.Height + 80, 600),
-                WindowStartupLocation = WindowStartupLocation.CenterScreen,
-                ResizeMode = ResizeMode.NoResize
+                WindowStyle = WindowStyle.None,
+                AllowsTransparency = true,
+                Background = Brushes.Transparent,
+                Topmost = true,
+                ShowInTaskbar = false,
+                Left = left,
+                Top = top,
+                Width = right - left,
+                Height = bottom - top
             };
 
-            // Convert bitmap to WPF ImageSource
-            var bitmapSource = System.Windows.Interop.Imaging.CreateBitmapSourceFromHBitmap(
-                bitmap.GetHbitmap(),
-                IntPtr.Zero,
-                Int32Rect.Empty,
-                BitmapSizeOptions.FromEmptyOptions());
-
-            var image = new Image
-            {
-                Source = bitmapSource,
-                Stretch = Stretch.Uniform
-            };
-
-            // Red border if no blobs found for color actions
-            var borderColor = (isColorAction && blobCount == 0) ? Brushes.Red : Brushes.Green;
+            var borderColor = useWhiteBorder
+                ? new SolidColorBrush(Color.FromArgb(255, 255, 255, 255))
+                : new SolidColorBrush(Color.FromArgb(255, 255, 0, 0));
+            var fillColor = useWhiteBorder
+                ? new SolidColorBrush(Color.FromArgb(50, 255, 255, 255))
+                : new SolidColorBrush(Color.FromArgb(50, 255, 0, 0));
 
             var border = new Border
             {
                 BorderBrush = borderColor,
                 BorderThickness = new Thickness(3),
-                Margin = new Thickness(10),
-                Child = image
+                Background = fillColor
             };
 
-            previewWindow.Content = border;
-            previewWindow.Show();
+            if (isCrosshair)
+            {
+                var canvas = new Canvas();
+                var horizontalLine = new Line
+                {
+                    X1 = 0, Y1 = overlayWindow.Height / 2,
+                    X2 = overlayWindow.Width, Y2 = overlayWindow.Height / 2,
+                    Stroke = Brushes.Red, StrokeThickness = 2
+                };
+                var verticalLine = new Line
+                {
+                    X1 = overlayWindow.Width / 2, Y1 = 0,
+                    X2 = overlayWindow.Width / 2, Y2 = overlayWindow.Height,
+                    Stroke = Brushes.Red, StrokeThickness = 2
+                };
+                canvas.Children.Add(horizontalLine);
+                canvas.Children.Add(verticalLine);
+                border.Child = canvas;
+            }
+
+            overlayWindow.Content = border;
+            overlayWindow.MouseDown += (s, args) => overlayWindow.Close();
+
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(2) };
+            timer.Tick += (s, args) =>
+            {
+                timer.Stop();
+                overlayWindow.Close();
+            };
+            timer.Start();
+
+            overlayWindow.Show();
         }
+
+
 
         private void fullTasksDataGrid_AutoGeneratingColumn(object sender, DataGridAutoGeneratingColumnEventArgs e)
         {

@@ -337,7 +337,7 @@ namespace BetterClicker.Logic
                     KeyBoardDown(KeyPresses.Space);
                     Thread.Sleep(200);
                     KeyboardUp(KeyPresses.Space);
-                    Thread.Sleep(8000);
+                    Thread.Sleep(MainWindow.AppModel.Settings.WorldHopDelayMs ?? 8000);
                     break;
                 case ActionType.QuickGreenBox:
                     var swat = Stopwatch.StartNew();
@@ -558,13 +558,25 @@ namespace BetterClicker.Logic
             {
                 var minX = Math.Min(task.PointX, task.RcPtX);
                 var maxX = Math.Max(task.PointX, task.RcPtX);
-
-                var pointX = Random.Next(minX, maxX);
-
                 var minY = Math.Min(task.PointY, task.RcPtY);
                 var maxY = Math.Max(task.PointY, task.RcPtY);
 
-                var pointY = Random.Next(minY, maxY);
+                // Inset by 10% on each side to avoid clicking edges
+                var marginX = (int)Math.Ceiling((maxX - minX) * 0.10);
+                var marginY = (int)Math.Ceiling((maxY - minY) * 0.10);
+                var safeMinX = minX + marginX;
+                var safeMaxX = maxX - marginX;
+                var safeMinY = minY + marginY;
+                var safeMaxY = maxY - marginY;
+
+                // Fallback to center if rectangle is too small for margins
+                if (safeMinX >= safeMaxX || safeMinY >= safeMaxY)
+                {
+                    return new Point((minX + maxX) / 2, (minY + maxY) / 2);
+                }
+
+                var pointX = Random.Next(safeMinX, safeMaxX);
+                var pointY = Random.Next(safeMinY, safeMaxY);
 
                 return new Point(pointX, pointY);
             }

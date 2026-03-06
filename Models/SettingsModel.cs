@@ -16,5 +16,6 @@ namespace BetterClicker.Models
         public Point WorldHopLeftTop { get; set; }
         public Point WorldHopRightBottom { get; set; }
         public int WorldHopCount { get; set; }
+        public int? WorldHopDelayMs { get; set; }
     }
 }

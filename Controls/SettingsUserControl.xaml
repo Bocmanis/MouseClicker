@@ -100,6 +100,7 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Label Content="World Hop" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
@@ -112,6 +113,9 @@
 
                 <Label Content="Count" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
                 <TextBox x:Name="worldHopCountTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="worldHopCountTextBox_LostFocus"/>
+
+                <Label Content="Delay (ms)" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="worldHopDelayTextBox" Grid.Row="4" Grid.Column="1" Height="22" Margin="0,2" LostFocus="worldHopDelayTextBox_LostFocus"/>
 
                 <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="8,0,0,0">
                     <Button x:Name="readWorldHopButton" Content="Read" Width="50" Height="22" Margin="0,0,0,2" Click="readWorldHopButton_Click"/>

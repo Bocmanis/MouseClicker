@@ -374,25 +374,67 @@ namespace BetterClicker.Logic
 
         private Models.Point GetPointFromEdgeToCenter(BlobCounter blobCounter, Blob blob, bool prettyAccurate = true)
         {
+            var center = blob.CenterOfGravity;
             var edges = blobCounter.GetBlobsEdgePoints(blob);
-            var randomEdgeNumber = Random.Next(edges.Count);
-            var randomEdge = edges[randomEdgeNumber];
 
-            var point = blob.CenterOfGravity;
-            var randomValue = Random.Next(1, 85);
-
-            float randomPercent = randomValue / 100f;
-            var xDelta = (point.X - randomEdge.X) * randomPercent;
-            var yDelta = (point.Y - randomEdge.Y) * randomPercent;
-            if (prettyAccurate)
+            // Try up to 10 times to find a point near center that is inside the blob
+            for (int attempt = 0; attempt < 10; attempt++)
             {
-                xDelta = xDelta / 2;
-                yDelta = yDelta / 2;
-            }
-            var resultX = point.X - xDelta;
-            var resultY = point.Y - yDelta;
+                // Pick a random edge point and move a small random amount from center toward it
+                var randomEdge = edges[Random.Next(edges.Count)];
 
-            return new Models.Point((int)resultX, (int)resultY);
+                // Stay within 30% of center-to-edge distance (close to center of mass)
+                float maxPercent = prettyAccurate ? 0.20f : 0.30f;
+                float percent = (float)(Random.NextDouble() * maxPercent);
+
+                var candidateX = center.X + (randomEdge.X - center.X) * percent;
+                var candidateY = center.Y + (randomEdge.Y - center.Y) * percent;
+
+                // Verify the point is inside the blob by checking it's closer to center
+                // than the nearest edge in that direction
+                if (IsPointInsideBlob(candidateX, candidateY, center, edges))
+                {
+                    return new Models.Point((int)candidateX, (int)candidateY);
+                }
+            }
+
+            // Fallback to center of mass
+            return new Models.Point((int)center.X, (int)center.Y);
+        }
+
+        private bool IsPointInsideBlob(float px, float py, AForge.Point center, List<AForge.IntPoint> edges)
+        {
+            // Find the edge point closest to the candidate's direction from center
+            float dirX = px - center.X;
+            float dirY = py - center.Y;
+            float distFromCenter = (float)Math.Sqrt(dirX * dirX + dirY * dirY);
+
+            if (distFromCenter < 1f)
+                return true; // essentially at center, always inside
+
+            // Normalize direction
+            dirX /= distFromCenter;
+            dirY /= distFromCenter;
+
+            // Find the edge point most aligned with this direction
+            float minEdgeDist = float.MaxValue;
+            foreach (var edge in edges)
+            {
+                float edgeDirX = edge.X - center.X;
+                float edgeDirY = edge.Y - center.Y;
+                float edgeDist = (float)Math.Sqrt(edgeDirX * edgeDirX + edgeDirY * edgeDirY);
+                if (edgeDist < 1f) continue;
+
+                // Dot product to check alignment
+                float dot = (edgeDirX / edgeDist) * dirX + (edgeDirY / edgeDist) * dirY;
+                if (dot > 0.9f) // roughly same direction
+                {
+                    if (edgeDist < minEdgeDist)
+                        minEdgeDist = edgeDist;
+                }
+            }
+
+            return distFromCenter < minEdgeDist * 0.85f;
         }
 
         public bool HasColorInRegion(Models.Point topLeft, Models.Point bottomRight, bool searchGreen)
@@ -440,6 +482,26 @@ namespace BetterClicker.Logic
             return new Models.Point(0, 0);
         }
 
+
+        public Rectangle? GetBiggestBlobRectangle(ActionType actionType)
+        {
+            Bitmap image = GetScreenshot("preview");
+
+            if (actionType == ActionType.ClickRedBox)
+                FilterOutRedBlobs(image);
+            else
+                FilterOutGreenBlobs(image);
+
+            BlobCounter blobCounter = GetBlobCounter();
+            blobCounter.ProcessImage(image);
+            Blob[] blobs = blobCounter.GetObjectsInformation();
+
+            var biggestBlob = blobs.OrderByDescending(x => x.Area).FirstOrDefault();
+            if (biggestBlob == null)
+                return null;
+
+            return biggestBlob.Rectangle;
+        }
 
         internal (int Size, Models.Point Point) GetGreenClosestToCenterGreenBlob()
         {

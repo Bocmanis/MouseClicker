@@ -49,6 +49,10 @@ namespace BetterClicker.Controls
             {
                 Settings.DoubleClickDelayMs = 350;
             }
+            if (Settings.WorldHopDelayMs == null)
+            {
+                Settings.WorldHopDelayMs = 8000;
+            }
             this.doubleClickTextBox.Text = Settings.DoubleClickDelayMs?.ToString();
             this.inventoryPrecisionModifierTextBox.Text = Settings.InventoryPrecisionModifier?.ToString();
             this.agilityModeCheckBox.IsChecked = Settings.AgilityMode;
@@ -80,6 +84,7 @@ namespace BetterClicker.Controls
             this.worldHopLeftTop_TextBox.Text = MakeCoordinateString(Settings.WorldHopLeftTop);
             this.worldHopRightBottom_TextBox.Text = MakeCoordinateString(Settings.WorldHopRightBottom);
             this.worldHopCountTextBox.Text = Settings.WorldHopCount.ToString();
+            this.worldHopDelayTextBox.Text = Settings.WorldHopDelayMs?.ToString();
         }
 
         private string MakeCoordinateString(Models.Point point)
@@ -270,6 +275,15 @@ namespace BetterClicker.Controls
             if (int.TryParse(worldHopCountTextBox.Text, out int worldCount))
             {
                 Settings.WorldHopCount = worldCount;
+                await SaveFile();
+            }
+        }
+
+        private async void worldHopDelayTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(worldHopDelayTextBox.Text, out int worldHopDelay))
+            {
+                Settings.WorldHopDelayMs = worldHopDelay;
                 await SaveFile();
             }
         }
