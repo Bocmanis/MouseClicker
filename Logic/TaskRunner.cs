@@ -82,9 +82,14 @@ namespace BetterClicker.Logic
         private void DoOverTask(OverTask overTask)
         {
             CurrentOverTask = overTask;
-            // Reset all counts at the start of each overtask iteration
-            // Remember only persists counts within fulltask repeats, not across overtask repeats
+            // Reset counts at the start of each overtask iteration
+            // Remember.Task persists counts within fulltask repeats, Remember.Always persists across overtask repeats
+            var alwaysEntries = MouseActionIncreaser.Where(x => x.Key.Remember == RememberType.Always).ToList();
             MouseActionIncreaser.Clear();
+            foreach (var entry in alwaysEntries)
+            {
+                MouseActionIncreaser[entry.Key] = entry.Value;
+            }
             foreach (var fullTask in overTask.FullTasks)
             {
                 CurrentFullTask = fullTask;
@@ -192,7 +197,7 @@ namespace BetterClicker.Logic
 
                 KeyboardUp(task.ClickKey);
 
-                if (!task.Remember)
+                if (task.Remember == RememberType.No)
                 {
                     MouseActionIncreaser.Remove(task);
                 }

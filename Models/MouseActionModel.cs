@@ -30,7 +30,7 @@ namespace BetterClicker.Models
 
         [DisplayName("+")]
         public int Increase { get; set; }
-        public bool Remember { get; set; }
+        public RememberType Remember { get; set; }
         public int RepTimes { get; set; }
         public KeyPresses ClickKey { get; set; }
 

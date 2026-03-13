@@ -11,3 +11,11 @@ This is a .NET Framework WPF project. Use MSBuild (not `dotnet build`).
 ## Output
 
 Executable: `bin\Release\BetterClicker.exe`
+
+## Run
+
+```
+start "" "D:\Personal\Projekti\Coding\MouseClicker\bin\Debug\BetterClicker.exe"
+```
+
+Build with `-p:Configuration=Debug` and launch from `bin\Debug\BetterClicker.exe`.

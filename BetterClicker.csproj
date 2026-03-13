@@ -126,6 +126,7 @@
     <Compile Include="Logic\TaskRunner.cs" />
     <Compile Include="Models\ConditionType.cs" />
     <Compile Include="Models\ActionType.cs" />
+    <Compile Include="Models\RememberType.cs" />
     <Compile Include="Models\AppModel.cs" />
     <Compile Include="Models\FullTask.cs" />
     <Compile Include="Models\KeyPresses.cs" />
