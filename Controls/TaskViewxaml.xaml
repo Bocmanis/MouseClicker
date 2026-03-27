@@ -37,21 +37,17 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
-                    <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
                 <ComboBox x:Name="overTaskDataGrid" Grid.Column="0" Height="26" Margin="0,0,8,0"/>
-                <TextBox x:Name="overTaskNameTextBox" Grid.Column="1" Height="23" Width="150" Margin="0,0,8,0" LostFocus="overTaskNameTextBox_LostFocus"/>
-                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,8,0" VerticalAlignment="Center">
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <TextBox x:Name="overTaskNameTextBox" Height="23" Width="150" Margin="0,0,8,0" LostFocus="overTaskNameTextBox_LostFocus"/>
                     <Label Content="Repeat:" Padding="0" VerticalAlignment="Center" Margin="0,0,4,0"/>
-                    <TextBox x:Name="repeatCountTextBox" Height="23" Width="40" LostFocus="repeatCountTextBox_LostFocus" PreviewTextInput="repeatCountTextBox_PreviewTextInput" VerticalAlignment="Center"/>
+                    <TextBox x:Name="repeatCountTextBox" Height="23" Width="40" Margin="0,0,8,0" LostFocus="repeatCountTextBox_LostFocus" PreviewTextInput="repeatCountTextBox_PreviewTextInput" VerticalAlignment="Center"/>
+                    <Button Content="+" Width="30" Height="26" Margin="0,0,4,0" Click="Button_Click_1" ToolTip="Add new OverTask"/>
+                    <Button x:Name="deleteOvertaskButton" Content="X" Width="30" Height="26" Margin="0,0,4,0" Click="deleteOvertaskButton_Click" ToolTip="Delete OverTask"/>
+                    <Button x:Name="saveConfigButton" Content="Save config" Width="90" Height="26" Click="saveConfigButton_Click"/>
                 </StackPanel>
-                <Button Content="+" Grid.Column="3" Width="30" Height="26" Margin="0,0,4,0" Click="Button_Click_1" ToolTip="Add new OverTask"/>
-                <Button x:Name="deleteOvertaskButton" Content="X" Grid.Column="4" Width="30" Height="26" Margin="0,0,8,0" Click="deleteOvertaskButton_Click" ToolTip="Delete OverTask"/>
-                <Button x:Name="saveConfigButton" Content="Save config" Grid.Column="5" Width="90" Height="26" Click="saveConfigButton_Click"/>
             </Grid>
         </StackPanel>
 
@@ -86,7 +82,11 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
 
-            <Label Content="C: base point, V: rectangle point" Grid.Column="0" VerticalAlignment="Center" Foreground="Gray"/>
+            <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button Content="Export" Width="50" Height="26" Margin="0,0,4,0" Click="exportOverTaskButton_Click" ToolTip="Export OverTask to JSON file"/>
+                <Button Content="Import" Width="50" Height="26" Margin="0,0,8,0" Click="importOverTaskButton_Click" ToolTip="Import OverTask from JSON file"/>
+                <Label Content="C: base point, V: rectangle point" VerticalAlignment="Center" Foreground="Gray" Padding="0"/>
+            </StackPanel>
             <StackPanel Grid.Column="1" Orientation="Horizontal">
                 <Button x:Name="addMouseActionButton" Content="Add action" Width="90" Height="26" Margin="0,0,4,0" Click="addMouseActionButton_Click"/>
                 <Button x:Name="insertMouseActionAboveButton" Content="Insert above" Width="90" Height="26" Margin="0,0,8,0" Click="insertMouseActionAbove_Click" ToolTip="Insert action above selected"/>

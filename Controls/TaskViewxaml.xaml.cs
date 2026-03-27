@@ -22,6 +22,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Windows.Threading;
+using Microsoft.Win32;
 
 namespace BetterClicker.Controls
 {
@@ -680,6 +681,53 @@ namespace BetterClicker.Controls
             var task = CurrentTask.ShallowCopy();
             CurrentOverTask.FullTasks.Add(task);
             await SaveFile();
+        }
+
+        private void exportOverTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (CurrentOverTask == null) return;
+
+            var dialog = new SaveFileDialog
+            {
+                Filter = "JSON files (*.json)|*.json",
+                FileName = CurrentOverTask.Name,
+                DefaultExt = ".json"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                var json = JsonConvert.SerializeObject(CurrentOverTask, Formatting.Indented);
+                File.WriteAllText(dialog.FileName, json);
+            }
+        }
+
+        private void importOverTaskButton_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new OpenFileDialog
+            {
+                Filter = "JSON files (*.json)|*.json",
+                DefaultExt = ".json"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                try
+                {
+                    var json = File.ReadAllText(dialog.FileName);
+                    var overTask = JsonConvert.DeserializeObject<OverTask>(json);
+                    if (overTask == null)
+                    {
+                        MessageBox.Show("Could not parse the file.", "Import Failed", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                    OverTaskSource.Add(overTask);
+                    overTaskDataGrid.SelectedItem = overTask;
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Import failed: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 }

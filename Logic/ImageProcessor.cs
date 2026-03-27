@@ -312,24 +312,24 @@ namespace BetterClicker.Logic
             return isSame;
         }
 
-        private static void FilterOutRedBlobs(Bitmap image)
+        private void FilterOutRedBlobs(Bitmap image)
         {
             ColorFiltering filter = new ColorFiltering();
             // set color ranges to keep
-            filter.Red = new IntRange(140, 255);
-            filter.Green = new IntRange(0, 60);
-            filter.Blue = new IntRange(140, 255);
+            filter.Red = new IntRange(Settings.RedFilterRedMin, Settings.RedFilterRedMax);
+            filter.Green = new IntRange(Settings.RedFilterGreenMin, Settings.RedFilterGreenMax);
+            filter.Blue = new IntRange(Settings.RedFilterBlueMin, Settings.RedFilterBlueMax);
 
             filter.ApplyInPlace(image);
         }
 
-        private static void FilterOutGreenBlobs(Bitmap image)
+        private void FilterOutGreenBlobs(Bitmap image)
         {
-            YCbCrFiltering filter = new YCbCrFiltering();
+            ColorFiltering filter = new ColorFiltering();
             // set color ranges to keep
-            filter.Cb = new Range(-0.7f, -0.2f);
-            filter.Cr = new Range(-0.7f, -0.2f);
-
+            filter.Red = new IntRange(Settings.GreenFilterRedMin, Settings.GreenFilterRedMax);
+            filter.Green = new IntRange(Settings.GreenFilterGreenMin, Settings.GreenFilterGreenMax);
+            filter.Blue = new IntRange(Settings.GreenFilterBlueMin, Settings.GreenFilterBlueMax);
 
             filter.ApplyInPlace(image);
         }

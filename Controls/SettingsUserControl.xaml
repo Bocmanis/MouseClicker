@@ -11,6 +11,7 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
@@ -156,6 +157,74 @@
 
                 <Label Content="Agility Mode" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
                 <CheckBox x:Name="agilityModeCheckBox" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Click="agilityModeCheckBox_Changed"/>
+            </Grid>
+        </Border>
+        <!-- Row 3: Color Filter Settings -->
+        <Border BorderBrush="#FFCCCCCC" BorderThickness="1" Padding="10" Margin="0,0,8,8" Grid.Row="3" Grid.Column="0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="Red Filter" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"/>
+
+                <Label Content="R" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Red"/>
+                <TextBox x:Name="redFilterRedMinTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
+                <Label Content="-" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="redFilterRedMaxTextBox" Grid.Row="1" Grid.Column="3" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
+
+                <Label Content="G" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Green"/>
+                <TextBox x:Name="redFilterGreenMinTextBox" Grid.Row="2" Grid.Column="1" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
+                <Label Content="-" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="redFilterGreenMaxTextBox" Grid.Row="2" Grid.Column="3" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
+
+                <Label Content="B" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Blue"/>
+                <TextBox x:Name="redFilterBlueMinTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
+                <Label Content="-" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="redFilterBlueMaxTextBox" Grid.Row="3" Grid.Column="3" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
+            </Grid>
+        </Border>
+
+        <Border BorderBrush="#FFCCCCCC" BorderThickness="1" Padding="10" Margin="0,0,8,8" Grid.Row="3" Grid.Column="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="100"/>
+                    <ColumnDefinition Width="60"/>
+                    <ColumnDefinition Width="10"/>
+                    <ColumnDefinition Width="60"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <Label Content="Green Filter" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"/>
+
+                <Label Content="R" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Red"/>
+                <TextBox x:Name="greenFilterRedMinTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>
+                <Label Content="-" Grid.Row="1" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="greenFilterRedMaxTextBox" Grid.Row="1" Grid.Column="3" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>
+
+                <Label Content="G" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Green"/>
+                <TextBox x:Name="greenFilterGreenMinTextBox" Grid.Row="2" Grid.Column="1" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>
+                <Label Content="-" Grid.Row="2" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="greenFilterGreenMaxTextBox" Grid.Row="2" Grid.Column="3" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>
+
+                <Label Content="B" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Blue"/>
+                <TextBox x:Name="greenFilterBlueMinTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>
+                <Label Content="-" Grid.Row="3" Grid.Column="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBox x:Name="greenFilterBlueMaxTextBox" Grid.Row="3" Grid.Column="3" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>
             </Grid>
         </Border>
     </Grid>

@@ -171,14 +171,16 @@ namespace BetterClicker.Logic
 
                 var isUntilColor = task.CheckCondition == ConditionType.UntilHasGreen || task.CheckCondition == ConditionType.UntilHasRed;
 
-                KeyBoardDown(task.ClickKey);
                 do
                 {
                     if (task.RepTimes == 0)
                     {
                         this.MouseActionCounterText = "1/1";
                         OnInfoChanged($"Doing single task: {task.TotallyNormalName}", new EventArgs());
+                        KeyBoardDown(task.ClickKey);
                         DoClick(task);
+                        Thread.Sleep(200);
+                        KeyboardUp(task.ClickKey);
                     }
                     else
                     {
@@ -190,12 +192,13 @@ namespace BetterClicker.Logic
                             }
                             this.MouseActionCounterText = $"{i + 1}/{task.RepTimes}";
                             OnInfoChanged($"Doing rep task: {task.TotallyNormalName}", new EventArgs());
+                            KeyBoardDown(task.ClickKey);
                             DoClick(task);
+                            Thread.Sleep(200);
+                            KeyboardUp(task.ClickKey);
                         }
                     }
                 } while (isUntilColor && !DoStop && !IsUntilColorMet(task));
-
-                KeyboardUp(task.ClickKey);
 
                 if (task.Remember == RememberType.No)
                 {

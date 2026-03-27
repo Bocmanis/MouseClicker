@@ -17,5 +17,21 @@ namespace BetterClicker.Models
         public Point WorldHopRightBottom { get; set; }
         public int WorldHopCount { get; set; }
         public int? WorldHopDelayMs { get; set; }
+
+        // Red color filter RGB ranges
+        public int RedFilterRedMin { get; set; } = 140;
+        public int RedFilterRedMax { get; set; } = 255;
+        public int RedFilterGreenMin { get; set; } = 0;
+        public int RedFilterGreenMax { get; set; } = 60;
+        public int RedFilterBlueMin { get; set; } = 140;
+        public int RedFilterBlueMax { get; set; } = 255;
+
+        // Green color filter RGB ranges
+        public int GreenFilterRedMin { get; set; } = 0;
+        public int GreenFilterRedMax { get; set; } = 80;
+        public int GreenFilterGreenMin { get; set; } = 140;
+        public int GreenFilterGreenMax { get; set; } = 255;
+        public int GreenFilterBlueMin { get; set; } = 0;
+        public int GreenFilterBlueMax { get; set; } = 80;
     }
 }

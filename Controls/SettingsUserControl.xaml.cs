@@ -62,6 +62,7 @@ namespace BetterClicker.Controls
             SetConditionPointTexts();
             SetCenterOfScreenPointTexts();
             SetWorldHopPointTexts();
+            SetColorFilterTexts();
         }
 
         private void SetInventoryPointTexts()
@@ -330,6 +331,45 @@ namespace BetterClicker.Controls
             var topLeft = new Models.Point(point.X - size / 2, point.Y - size / 2);
             var bottomRight = new Models.Point(point.X + size / 2, point.Y + size / 2);
             ShowAreaOverlay(topLeft, bottomRight, "Screen Center", true);
+        }
+
+        private void SetColorFilterTexts()
+        {
+            redFilterRedMinTextBox.Text = Settings.RedFilterRedMin.ToString();
+            redFilterRedMaxTextBox.Text = Settings.RedFilterRedMax.ToString();
+            redFilterGreenMinTextBox.Text = Settings.RedFilterGreenMin.ToString();
+            redFilterGreenMaxTextBox.Text = Settings.RedFilterGreenMax.ToString();
+            redFilterBlueMinTextBox.Text = Settings.RedFilterBlueMin.ToString();
+            redFilterBlueMaxTextBox.Text = Settings.RedFilterBlueMax.ToString();
+
+            greenFilterRedMinTextBox.Text = Settings.GreenFilterRedMin.ToString();
+            greenFilterRedMaxTextBox.Text = Settings.GreenFilterRedMax.ToString();
+            greenFilterGreenMinTextBox.Text = Settings.GreenFilterGreenMin.ToString();
+            greenFilterGreenMaxTextBox.Text = Settings.GreenFilterGreenMax.ToString();
+            greenFilterBlueMinTextBox.Text = Settings.GreenFilterBlueMin.ToString();
+            greenFilterBlueMaxTextBox.Text = Settings.GreenFilterBlueMax.ToString();
+        }
+
+        private async void redFilterTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(redFilterRedMinTextBox.Text, out int rMin)) Settings.RedFilterRedMin = rMin;
+            if (int.TryParse(redFilterRedMaxTextBox.Text, out int rMax)) Settings.RedFilterRedMax = rMax;
+            if (int.TryParse(redFilterGreenMinTextBox.Text, out int gMin)) Settings.RedFilterGreenMin = gMin;
+            if (int.TryParse(redFilterGreenMaxTextBox.Text, out int gMax)) Settings.RedFilterGreenMax = gMax;
+            if (int.TryParse(redFilterBlueMinTextBox.Text, out int bMin)) Settings.RedFilterBlueMin = bMin;
+            if (int.TryParse(redFilterBlueMaxTextBox.Text, out int bMax)) Settings.RedFilterBlueMax = bMax;
+            await SaveFile();
+        }
+
+        private async void greenFilterTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(greenFilterRedMinTextBox.Text, out int rMin)) Settings.GreenFilterRedMin = rMin;
+            if (int.TryParse(greenFilterRedMaxTextBox.Text, out int rMax)) Settings.GreenFilterRedMax = rMax;
+            if (int.TryParse(greenFilterGreenMinTextBox.Text, out int gMin)) Settings.GreenFilterGreenMin = gMin;
+            if (int.TryParse(greenFilterGreenMaxTextBox.Text, out int gMax)) Settings.GreenFilterGreenMax = gMax;
+            if (int.TryParse(greenFilterBlueMinTextBox.Text, out int bMin)) Settings.GreenFilterBlueMin = bMin;
+            if (int.TryParse(greenFilterBlueMaxTextBox.Text, out int bMax)) Settings.GreenFilterBlueMax = bMax;
+            await SaveFile();
         }
 
         private void ShowAreaOverlay(Models.Point topLeft, Models.Point bottomRight, string title, bool isCrosshair = false)
