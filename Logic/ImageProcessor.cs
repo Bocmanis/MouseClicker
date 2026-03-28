@@ -41,10 +41,10 @@ namespace BetterClicker.Logic
             this.Random = new Random(DateTime.Now.Millisecond);
         }
 
-        public Models.Point GetColouredBoxPoint(ActionType actionType, Models.Point overrideCenter = null)
+        public Models.Point GetColouredBoxPoint(ActionType actionType, Models.Point overrideCenter = null, int rectX = 0, int rectY = 0, int rectX2 = 0, int rectY2 = 0)
         {
             // locating objects
-            var centerPoint = FindBlobs(actionType, overrideCenter);
+            var centerPoint = FindBlobs(actionType, overrideCenter, rectX, rectY, rectX2, rectY2);
             return centerPoint;
         }
 
@@ -76,7 +76,7 @@ namespace BetterClicker.Logic
             }
         }
 
-        public Models.Point FindBlobs(ActionType actionType, Models.Point overrideCenter = null)
+        public Models.Point FindBlobs(ActionType actionType, Models.Point overrideCenter = null, int rectX = 0, int rectY = 0, int rectX2 = 0, int rectY2 = 0)
         {
             switch (actionType)
             {
@@ -165,6 +165,8 @@ namespace BetterClicker.Logic
                     return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
                 case ActionType.ClickNearestToCenterColBox:
                     return GetClosestToCenterBlob(image, blobCounter, blobs, overrideCenter);
+                case ActionType.ClickClosestBlobToCoordinates:
+                    return GetClosestToRectangleCenterBlob(image, blobCounter, blobs, rectX, rectY, rectX2, rectY2);
                 default:
                     return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
             }
@@ -368,6 +370,28 @@ namespace BetterClicker.Logic
                 ? overrideCenter
                 : Settings.ScreenCenter;
             var centerPoint = new AForge.Point(center.X, center.Y);
+            var closestBlob = blobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
+            return closestBlob;
+        }
+
+        private Models.Point GetClosestToRectangleCenterBlob(Bitmap image, BlobCounter blobCounter, Blob[] blobs, int rectX, int rectY, int rectX2, int rectY2)
+        {
+            Blob closestBlob = GetClosestToRectangleCenterBlobBlob(blobs, rectX, rectY, rectX2, rectY2);
+            if (closestBlob != null)
+            {
+                return GetPointFromEdgeToCenter(blobCounter, closestBlob);
+            }
+            return new Models.Point(0, 0);
+        }
+
+        private Blob GetClosestToRectangleCenterBlobBlob(Blob[] blobs, int rectX, int rectY, int rectX2, int rectY2)
+        {
+            // Calculate rectangle center
+            int centerX = (rectX + rectX2) / 2;
+            int centerY = (rectY + rectY2) / 2;
+            var centerPoint = new AForge.Point(centerX, centerY);
+            
+            // Find blob closest to rectangle center
             var closestBlob = blobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
             return closestBlob;
         }

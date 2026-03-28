@@ -10,6 +10,7 @@
         None, //Wait
         ClickBiggestColBox,
         ClickNearestToCenterColBox,
+        ClickClosestBlobToCoordinates,
         ClickRedBox,
         ClickGreenBox,
         WorldHop,
