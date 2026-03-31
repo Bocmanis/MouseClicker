@@ -175,7 +175,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Content="Red Filter" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"/>
+                <Label Content="Red Filter" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+                <Border x:Name="redFilterPreviewMin" Grid.Row="0" Grid.Column="1" Width="20" Height="20" BorderBrush="Gray" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,2,0"/>
+                <Border x:Name="redFilterPreviewMax" Grid.Row="0" Grid.Column="3" Width="20" Height="20" BorderBrush="Gray" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
 
                 <Label Content="R" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Red"/>
                 <TextBox x:Name="redFilterRedMinTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2" LostFocus="redFilterTextBox_LostFocus"/>
@@ -209,7 +211,9 @@
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Label Content="Green Filter" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"/>
+                <Label Content="Green Filter" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"/>
+                <Border x:Name="greenFilterPreviewMin" Grid.Row="0" Grid.Column="1" Width="20" Height="20" BorderBrush="Gray" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Right" Margin="0,0,2,0"/>
+                <Border x:Name="greenFilterPreviewMax" Grid.Row="0" Grid.Column="3" Width="20" Height="20" BorderBrush="Gray" BorderThickness="1" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="2,0,0,0"/>
 
                 <Label Content="R" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Padding="0,2" Foreground="Red"/>
                 <TextBox x:Name="greenFilterRedMinTextBox" Grid.Row="1" Grid.Column="1" Height="22" Margin="0,2" LostFocus="greenFilterTextBox_LostFocus"/>

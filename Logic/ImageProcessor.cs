@@ -437,6 +437,73 @@ namespace BetterClicker.Logic
             return distFromCenter < minEdgeDist * 0.85f;
         }
 
+        public Models.Point FindClosestToCoordinates(int x1, int y1, int x2, int y2)
+        {
+            bool isPointMode = x2 == 0 && y2 == 0;
+
+            // Try green first, then red
+            foreach (bool useGreen in new[] { true, false })
+            {
+                if (isPointMode)
+                {
+                    // Point mode: full screenshot, find blob closest to (x1, y1)
+                    using (Bitmap image = GetScreenshot(useGreen ? "ClosestCoordGreen" : "ClosestCoordRed"))
+                    {
+                        if (useGreen)
+                            FilterOutGreenBlobs(image);
+                        else
+                            FilterOutRedBlobs(image);
+
+                        BlobCounter blobCounter = GetBlobCounter();
+                        blobCounter.ProcessImage(image);
+                        Blob[] blobs = blobCounter.GetObjectsInformation();
+
+                        SaveImage(image, useGreen ? "closestCoordGreenMarked.png" : "closestCoordRedMarked.png");
+
+                        if (blobs.Length == 0)
+                            continue;
+
+                        var targetPoint = new AForge.Point(x1, y1);
+                        var closestBlob = blobs.OrderBy(b => b.CenterOfGravity.DistanceTo(targetPoint)).First();
+                        return GetPointFromEdgeToCenter(blobCounter, closestBlob);
+                    }
+                }
+                else
+                {
+                    // Region mode: screenshot from rectangle, find biggest blob
+                    var minX = Math.Min(x1, x2);
+                    var minY = Math.Min(y1, y2);
+                    var maxX = Math.Max(x1, x2);
+                    var maxY = Math.Max(y1, y2);
+                    var rect = new Rectangle(minX, minY, maxX - minX, maxY - minY);
+
+                    using (Bitmap image = GetScreenshot(rect))
+                    {
+                        if (useGreen)
+                            FilterOutGreenBlobs(image);
+                        else
+                            FilterOutRedBlobs(image);
+
+                        BlobCounter blobCounter = GetBlobCounter();
+                        blobCounter.ProcessImage(image);
+                        Blob[] blobs = blobCounter.GetObjectsInformation();
+
+                        SaveImage(image, useGreen ? "closestCoordRegionGreen.png" : "closestCoordRegionRed.png");
+
+                        if (blobs.Length == 0)
+                            continue;
+
+                        var biggestBlob = blobs.OrderByDescending(b => b.Area).First();
+                        var point = GetPointFromEdgeToCenter(blobCounter, biggestBlob);
+                        // Offset back to screen coordinates
+                        return new Models.Point(point.X + minX, point.Y + minY);
+                    }
+                }
+            }
+
+            return new Models.Point(0, 0);
+        }
+
         public bool HasColorInRegion(Models.Point topLeft, Models.Point bottomRight, bool searchGreen)
         {
             var rectangle = GetConditionRectangle(topLeft, bottomRight);

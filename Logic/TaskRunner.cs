@@ -359,6 +359,13 @@ namespace BetterClicker.Logic
                     swat.Stop();
                     OnInfoChanged("ClickGreenBoxTime: " + swat.ElapsedMilliseconds, new InfoChangedEventArgs() { GreenBoxTimeMessage = "ClickGreenBoxTime: " + sw.ElapsedMilliseconds });
                     break;
+                case ActionType.ClosestToCoordinates:
+                    var closestPoint = ImageProcessor.FindClosestToCoordinates(task.PointX, task.PointY, task.RcPtX, task.RcPtY);
+                    if (closestPoint.X != 0)
+                    {
+                        MouseActions.DoLeftClick(closestPoint);
+                    }
+                    break;
                 case ActionType.WaitForCondition:
                 case ActionType.None:
                 default:

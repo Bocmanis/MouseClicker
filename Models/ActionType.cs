@@ -16,5 +16,6 @@
         QuickGreenBox,
         WaitForCondition,
         FindGreens,
+        ClosestToCoordinates,
     }
 }

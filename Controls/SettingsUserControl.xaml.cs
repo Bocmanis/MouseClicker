@@ -348,6 +348,21 @@ namespace BetterClicker.Controls
             greenFilterGreenMaxTextBox.Text = Settings.GreenFilterGreenMax.ToString();
             greenFilterBlueMinTextBox.Text = Settings.GreenFilterBlueMin.ToString();
             greenFilterBlueMaxTextBox.Text = Settings.GreenFilterBlueMax.ToString();
+
+            UpdateColorPreviews();
+        }
+
+        private void UpdateColorPreviews()
+        {
+            redFilterPreviewMin.Background = new SolidColorBrush(Color.FromRgb(
+                (byte)Settings.RedFilterRedMin, (byte)Settings.RedFilterGreenMin, (byte)Settings.RedFilterBlueMin));
+            redFilterPreviewMax.Background = new SolidColorBrush(Color.FromRgb(
+                (byte)Settings.RedFilterRedMax, (byte)Settings.RedFilterGreenMax, (byte)Settings.RedFilterBlueMax));
+
+            greenFilterPreviewMin.Background = new SolidColorBrush(Color.FromRgb(
+                (byte)Settings.GreenFilterRedMin, (byte)Settings.GreenFilterGreenMin, (byte)Settings.GreenFilterBlueMin));
+            greenFilterPreviewMax.Background = new SolidColorBrush(Color.FromRgb(
+                (byte)Settings.GreenFilterRedMax, (byte)Settings.GreenFilterGreenMax, (byte)Settings.GreenFilterBlueMax));
         }
 
         private async void redFilterTextBox_LostFocus(object sender, RoutedEventArgs e)
@@ -358,6 +373,7 @@ namespace BetterClicker.Controls
             if (int.TryParse(redFilterGreenMaxTextBox.Text, out int gMax)) Settings.RedFilterGreenMax = gMax;
             if (int.TryParse(redFilterBlueMinTextBox.Text, out int bMin)) Settings.RedFilterBlueMin = bMin;
             if (int.TryParse(redFilterBlueMaxTextBox.Text, out int bMax)) Settings.RedFilterBlueMax = bMax;
+            UpdateColorPreviews();
             await SaveFile();
         }
 
@@ -369,6 +385,7 @@ namespace BetterClicker.Controls
             if (int.TryParse(greenFilterGreenMaxTextBox.Text, out int gMax)) Settings.GreenFilterGreenMax = gMax;
             if (int.TryParse(greenFilterBlueMinTextBox.Text, out int bMin)) Settings.GreenFilterBlueMin = bMin;
             if (int.TryParse(greenFilterBlueMaxTextBox.Text, out int bMax)) Settings.GreenFilterBlueMax = bMax;
+            UpdateColorPreviews();
             await SaveFile();
         }
 
