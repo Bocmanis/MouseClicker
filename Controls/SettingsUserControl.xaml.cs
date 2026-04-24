@@ -53,10 +53,15 @@ namespace BetterClicker.Controls
             {
                 Settings.WorldHopDelayMs = 8000;
             }
+            if (Settings.RetryDelayMs == null)
+            {
+                Settings.RetryDelayMs = 2000;
+            }
             this.doubleClickTextBox.Text = Settings.DoubleClickDelayMs?.ToString();
             this.inventoryPrecisionModifierTextBox.Text = Settings.InventoryPrecisionModifier?.ToString();
             this.agilityModeCheckBox.IsChecked = Settings.AgilityMode;
             this.minBlobSizeTextBox.Text = Settings.MinBlobSize?.ToString();
+            this.retryDelayTextBox.Text = Settings.RetryDelayMs?.ToString();
 
             SetInventoryPointTexts();
             SetConditionPointTexts();
@@ -246,6 +251,15 @@ namespace BetterClicker.Controls
             }
         }
 
+        private async void retryDelayTextBox_LostFocus(object sender, RoutedEventArgs e)
+        {
+            if (int.TryParse(retryDelayTextBox.Text, out int retryDelay))
+            {
+                Settings.RetryDelayMs = retryDelay;
+                await SaveFile();
+            }
+        }
+
         private async void agilityModeCheckBox_Changed(object sender, RoutedEventArgs e)
         {
             Settings.AgilityMode = agilityModeCheckBox.IsChecked ?? false;
@@ -315,6 +329,113 @@ namespace BetterClicker.Controls
         private void showWorldHopButton_Click(object sender, RoutedEventArgs e)
         {
             ShowAreaOverlay(Settings.WorldHopLeftTop, Settings.WorldHopRightBottom, "World Hop Area");
+        }
+
+        private void previewWorldHopButton_Click(object sender, RoutedEventArgs e)
+        {
+            var worldCount = Settings.WorldHopCount;
+            var leftTop = Settings.WorldHopLeftTop;
+            var rightBottom = Settings.WorldHopRightBottom;
+
+            if (leftTop == null || rightBottom == null)
+            {
+                MessageBox.Show("World Hop area not set", "Not Set", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            if (worldCount <= 0)
+            {
+                MessageBox.Show("World Hop Count must be greater than 0", "Invalid Count", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+
+            var width = rightBottom.X - leftTop.X;
+            var height = rightBottom.Y - leftTop.Y;
+
+            decimal verticalIncrement = (rightBottom.Y - leftTop.Y) / (decimal)worldCount;
+            var precision = (int)Math.Round(verticalIncrement / 3, 0);
+
+            var minX = precision;
+            var maxX = width - precision;
+            if (minX >= maxX)
+            {
+                minX = 0;
+                maxX = width;
+            }
+
+            var overlayWindow = new Window
+            {
+                WindowStyle = WindowStyle.None,
+                AllowsTransparency = true,
+                Background = Brushes.Transparent,
+                Topmost = true,
+                ShowInTaskbar = false,
+                Left = leftTop.X,
+                Top = leftTop.Y,
+                Width = width,
+                Height = height
+            };
+
+            var canvas = new Canvas();
+
+            var outer = new System.Windows.Shapes.Rectangle
+            {
+                Width = width,
+                Height = height,
+                Stroke = new SolidColorBrush(Color.FromArgb(200, 255, 255, 0)),
+                StrokeThickness = 2,
+                Fill = Brushes.Transparent
+            };
+            Canvas.SetLeft(outer, 0);
+            Canvas.SetTop(outer, 0);
+            canvas.Children.Add(outer);
+
+            for (int row = 0; row < worldCount; row++)
+            {
+                var yLeftTop = (int)Math.Round(precision + row * verticalIncrement);
+                var yRightBottom = (int)Math.Round(-precision + verticalIncrement * (row + 1));
+                if (yLeftTop >= yRightBottom)
+                {
+                    yLeftTop = (int)(row * verticalIncrement);
+                    yRightBottom = (int)((row + 1) * verticalIncrement);
+                }
+
+                var rect = new System.Windows.Shapes.Rectangle
+                {
+                    Width = maxX - minX,
+                    Height = yRightBottom - yLeftTop,
+                    Stroke = new SolidColorBrush(Color.FromArgb(255, 255, 0, 0)),
+                    StrokeThickness = 2,
+                    Fill = new SolidColorBrush(Color.FromArgb(50, 255, 0, 0))
+                };
+                Canvas.SetLeft(rect, minX);
+                Canvas.SetTop(rect, yLeftTop);
+                canvas.Children.Add(rect);
+
+                var label = new TextBlock
+                {
+                    Text = (row + 1).ToString(),
+                    Foreground = Brushes.White,
+                    Background = new SolidColorBrush(Color.FromArgb(180, 0, 0, 0)),
+                    Padding = new Thickness(3, 0, 3, 0),
+                    FontWeight = FontWeights.Bold
+                };
+                Canvas.SetLeft(label, minX + 2);
+                Canvas.SetTop(label, yLeftTop + 2);
+                canvas.Children.Add(label);
+            }
+
+            overlayWindow.Content = canvas;
+            overlayWindow.MouseDown += (s, args) => overlayWindow.Close();
+
+            var timer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(5) };
+            timer.Tick += (s, args) =>
+            {
+                timer.Stop();
+                overlayWindow.Close();
+            };
+            timer.Start();
+
+            overlayWindow.Show();
         }
 
         private void showCenterButton_Click(object sender, RoutedEventArgs e)

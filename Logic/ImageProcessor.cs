@@ -90,6 +90,7 @@ namespace BetterClicker.Logic
                     break;
             }
             Bitmap image = GetScreenshot("NormalGreen");
+            Bitmap imageForRed = (Bitmap)image.Clone();
             FilterOutGreenBlobs(image);
 
             BlobCounter blobCounter = GetBlobCounter();
@@ -105,7 +106,7 @@ namespace BetterClicker.Logic
 
             if (blobs.Length == 0)
             {
-                var newImage = GetScreenshot("FailedGreenRed");
+                var newImage = imageForRed;
                 FilterOutRedBlobs(newImage);
                 blobCounter.ProcessImage(newImage);
                 Blob[] redBlobs = blobCounter.GetObjectsInformation();
@@ -128,7 +129,6 @@ namespace BetterClicker.Logic
                         }
                         var point = GetPointFromEdgeToCenter(blobCounter, smallBlob, true);
                         MouseActions.DoLeftClick(point);
-                        Thread.Sleep(4000);
                         return GetColouredBoxPoint(actionType);
                     }
                 }
@@ -136,16 +136,7 @@ namespace BetterClicker.Logic
                 {
                     var centerPoint = new AForge.Point(Settings.ScreenCenter.X, Settings.ScreenCenter.Y);
                     var closestBlob = redBlobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
-                    var distance = closestBlob.CenterOfGravity.DistanceTo(centerPoint);
                     var point = GetPointFromEdgeToCenter(blobCounter, closestBlob, true);
-                    if (distance > 350)
-                    {
-                        Thread.Sleep(600);
-                        if (point.X > 650)
-                        {
-                            Thread.Sleep(600);
-                        }
-                    }
                     return point;
                 }
                 if (redBlobs.Length != 0)
@@ -154,7 +145,10 @@ namespace BetterClicker.Logic
                 }
                 else
                 {
-                    Thread.Sleep(2000);
+                    var retryDelay = Settings.RetryDelayMs ?? 2000;
+                    if (retryDelay == 0)
+                        return new Models.Point(0, 0);
+                    Thread.Sleep(retryDelay);
                     return GetColouredBoxPointRetry(actionType);
                 }
             }

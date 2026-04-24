@@ -184,17 +184,23 @@ namespace BetterClicker.Logic
                     }
                     else
                     {
-                        for (int i = 0; i < task.RepTimes; i++)
+                        KeyBoardDown(task.ClickKey);
+                        try
                         {
-                            if (DoStop)
+                            for (int i = 0; i < task.RepTimes; i++)
                             {
-                                return;
+                                if (DoStop)
+                                {
+                                    return;
+                                }
+                                this.MouseActionCounterText = $"{i + 1}/{task.RepTimes}";
+                                OnInfoChanged($"Doing rep task: {task.TotallyNormalName}", new EventArgs());
+                                DoClick(task);
+                                Thread.Sleep(200);
                             }
-                            this.MouseActionCounterText = $"{i + 1}/{task.RepTimes}";
-                            OnInfoChanged($"Doing rep task: {task.TotallyNormalName}", new EventArgs());
-                            KeyBoardDown(task.ClickKey);
-                            DoClick(task);
-                            Thread.Sleep(200);
+                        }
+                        finally
+                        {
                             KeyboardUp(task.ClickKey);
                         }
                     }
