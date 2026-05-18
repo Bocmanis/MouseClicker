@@ -326,6 +326,7 @@ namespace BetterClicker.Logic
                     break;
                 case ActionType.ClickBiggestColBox:
                 case ActionType.ClickNearestToCenterColBox:
+                case ActionType.ClickClosestBlobToCoordinates:
                 case ActionType.ClickRedBox:
                 case ActionType.ClickGreenBox:
                     var swa = Stopwatch.StartNew();
@@ -334,7 +335,7 @@ namespace BetterClicker.Logic
                     {
                         overrideCenter = new Point(task.PointX, task.PointY);
                     }
-                    var colourPoint = ImageProcessor.GetColouredBoxPoint(task.ActionType, overrideCenter);
+                    var colourPoint = ImageProcessor.GetColouredBoxPoint(task.ActionType, overrideCenter, task.PointX, task.PointY, task.RcPtX, task.RcPtY);
                     if (colourPoint.X == 0)
                     {
                         colourPoint = GetPoint(task);
