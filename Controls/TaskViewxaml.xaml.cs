@@ -264,6 +264,10 @@ namespace BetterClicker.Controls
             {
                 return;
             }
+            if (CurrentMouseAction.ActionType == ActionType.ClickNearestToCenterColBox)
+            {
+                return;
+            }
             if (e.Key == Key.C)
             {
                 var position = MouseActions.GetMousePosition();

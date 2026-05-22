@@ -71,6 +71,9 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Label Content="Condition" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
@@ -84,6 +87,19 @@
                 <StackPanel Grid.Row="1" Grid.Column="2" Grid.RowSpan="2" Margin="8,0,0,0">
                     <Button x:Name="readConditionButton" Content="Read" Width="50" Height="22" Margin="0,0,0,2" Click="readConditionButton_Click"/>
                     <Button x:Name="showConditionButton" Content="Show" Width="50" Height="22" Click="showConditionButton_Click"/>
+                </StackPanel>
+
+                <Label Content="Status Check" FontWeight="SemiBold" Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2"/>
+
+                <Label Content="Left Top" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="leftTopStatusCheckTextBox" Grid.Row="4" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <Label Content="Right Bottom" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="rightBottomStatusCheckTextBox" Grid.Row="5" Grid.Column="1" Height="22" Margin="0,2"/>
+
+                <StackPanel Grid.Row="4" Grid.Column="2" Grid.RowSpan="2" Margin="8,0,0,0">
+                    <Button x:Name="readStatusCheckButton" Content="Read" Width="50" Height="22" Margin="0,0,0,2" Click="readStatusCheckButton_Click"/>
+                    <Button x:Name="showStatusCheckButton" Content="Show" Width="50" Height="22" Click="showStatusCheckButton_Click"/>
                 </StackPanel>
             </Grid>
         </Border>
@@ -139,7 +155,6 @@
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
                 <Label Content="Other Settings" FontWeight="SemiBold" Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"/>
@@ -157,11 +172,8 @@
                 <Label Content="Min Blob Size" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
                 <TextBox x:Name="minBlobSizeTextBox" Grid.Row="3" Grid.Column="1" Height="22" Margin="0,2" LostFocus="minBlobSizeTextBox_LostFocus"/>
 
-                <Label Content="Agility Mode" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
-                <CheckBox x:Name="agilityModeCheckBox" Grid.Row="4" Grid.Column="1" VerticalAlignment="Center" Click="agilityModeCheckBox_Changed"/>
-
-                <Label Content="Retry Delay (ms)" Grid.Row="5" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
-                <TextBox x:Name="retryDelayTextBox" Grid.Row="5" Grid.Column="1" Height="22" Margin="0,2" LostFocus="retryDelayTextBox_LostFocus"/>
+                <Label Content="Retry Delay (ms)" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Padding="0,2"/>
+                <TextBox x:Name="retryDelayTextBox" Grid.Row="4" Grid.Column="1" Height="22" Margin="0,2" LostFocus="retryDelayTextBox_LostFocus"/>
             </Grid>
         </Border>
         <!-- Row 3: Color Filter Settings -->

@@ -10,9 +10,10 @@ namespace BetterClicker.Models
         public int? InventoryPrecisionModifier { get; set; }
         public Point ConditionLeftTop { get; set; }
         public Point ConditionRightBottom { get; set; }
+        public Point StatusCheckLeftTop { get; set; }
+        public Point StatusCheckRightBottom { get; set; }
         public Point ScreenCenter { get; set; }
         public int? MinBlobSize { get; set; }
-        public bool AgilityMode { get; set; }
         public int? RetryDelayMs { get; set; }
         public Point WorldHopLeftTop { get; set; }
         public Point WorldHopRightBottom { get; set; }

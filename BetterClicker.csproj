@@ -56,10 +56,10 @@
     <ApplicationIcon>computer-mouse48_41904.ico</ApplicationIcon>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>E844F636AAF880655ECF4CE4DA90FAD1F8998AE0</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>B0CE021CD8F102093F8FE4297FCC457B23612100</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>BetterClicker_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>BetterClicker_3_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -175,6 +175,7 @@
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
     <None Include="BetterClicker_1_TemporaryKey.pfx" />
+    <None Include="BetterClicker_3_TemporaryKey.pfx" />
     <None Include="BetterClicker_TemporaryKey.pfx" />
     <None Include="packages.config" />
     <None Include="Properties\app.manifest" />

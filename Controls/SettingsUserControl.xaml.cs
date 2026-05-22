@@ -29,6 +29,7 @@ namespace BetterClicker.Controls
     {
         public bool InventoryPointReadActive { get; private set; }
         public bool ConditionPointReadActive { get; private set; }
+        public bool StatusCheckPointReadActive { get; private set; }
         public bool WorldHopPointReadActive { get; private set; }
 
         public bool CenterOfScreenPointReadActive { get; private set; }
@@ -59,12 +60,12 @@ namespace BetterClicker.Controls
             }
             this.doubleClickTextBox.Text = Settings.DoubleClickDelayMs?.ToString();
             this.inventoryPrecisionModifierTextBox.Text = Settings.InventoryPrecisionModifier?.ToString();
-            this.agilityModeCheckBox.IsChecked = Settings.AgilityMode;
             this.minBlobSizeTextBox.Text = Settings.MinBlobSize?.ToString();
             this.retryDelayTextBox.Text = Settings.RetryDelayMs?.ToString();
 
             SetInventoryPointTexts();
             SetConditionPointTexts();
+            SetStatusCheckPointTexts();
             SetCenterOfScreenPointTexts();
             SetWorldHopPointTexts();
             SetColorFilterTexts();
@@ -79,6 +80,12 @@ namespace BetterClicker.Controls
         {
             this.rightBottomConditionTextBox.Text = MakeCoordinateString(Settings.ConditionRightBottom);
             this.leftTopConditionTextBox.Text = MakeCoordinateString(Settings.ConditionLeftTop);
+        }
+
+        private void SetStatusCheckPointTexts()
+        {
+            this.rightBottomStatusCheckTextBox.Text = MakeCoordinateString(Settings.StatusCheckRightBottom);
+            this.leftTopStatusCheckTextBox.Text = MakeCoordinateString(Settings.StatusCheckLeftTop);
         }
         private void SetCenterOfScreenPointTexts()
         {
@@ -134,6 +141,11 @@ namespace BetterClicker.Controls
                     Settings.ConditionLeftTop = MouseActions.GetMousePosition();
                     SetConditionPointTexts();
                 }
+                if (this.StatusCheckPointReadActive)
+                {
+                    Settings.StatusCheckLeftTop = MouseActions.GetMousePosition();
+                    SetStatusCheckPointTexts();
+                }
                 if (this.CenterOfScreenPointReadActive)
                 {
                     Settings.ScreenCenter = MouseActions.GetMousePosition();
@@ -156,6 +168,11 @@ namespace BetterClicker.Controls
                 {
                     Settings.ConditionRightBottom = MouseActions.GetMousePosition();
                     SetConditionPointTexts();
+                }
+                if (this.StatusCheckPointReadActive)
+                {
+                    Settings.StatusCheckRightBottom = MouseActions.GetMousePosition();
+                    SetStatusCheckPointTexts();
                 }
                 if (this.WorldHopPointReadActive)
                 {
@@ -242,6 +259,24 @@ namespace BetterClicker.Controls
             }
         }
 
+        private void readStatusCheckButton_Click(object sender, RoutedEventArgs e)
+        {
+            this.StatusCheckPointReadActive = !StatusCheckPointReadActive;
+            if (StatusCheckPointReadActive)
+            {
+                readStatusCheckButton.Background = Brushes.Green;
+            }
+            else
+            {
+                readStatusCheckButton.Background = Brushes.Gray;
+            }
+        }
+
+        private void showStatusCheckButton_Click(object sender, RoutedEventArgs e)
+        {
+            ShowAreaOverlay(Settings.StatusCheckLeftTop, Settings.StatusCheckRightBottom, "Status Check Area");
+        }
+
         private async void minBlobSizeTextBox_LostFocus(object sender, RoutedEventArgs e)
         {
             if (int.TryParse(minBlobSizeTextBox.Text, out int inventoryPrecision))
@@ -258,12 +293,6 @@ namespace BetterClicker.Controls
                 Settings.RetryDelayMs = retryDelay;
                 await SaveFile();
             }
-        }
-
-        private async void agilityModeCheckBox_Changed(object sender, RoutedEventArgs e)
-        {
-            Settings.AgilityMode = agilityModeCheckBox.IsChecked ?? false;
-            await SaveFile();
         }
 
         private void takeScreenshotsButton_Click(object sender, RoutedEventArgs e)

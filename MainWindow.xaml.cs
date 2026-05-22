@@ -59,7 +59,31 @@ namespace BetterClicker
             {
                 var text = inputFile.ReadToEnd();
                 var result = JsonConvert.DeserializeObject<AppModel>(text);
+                ScrubObsoleteCoords(result);
                 return result;
+            }
+        }
+
+        private static void ScrubObsoleteCoords(AppModel model)
+        {
+            if (model?.OverTasks == null) return;
+            foreach (var overTask in model.OverTasks)
+            {
+                if (overTask?.FullTasks == null) continue;
+                foreach (var task in overTask.FullTasks)
+                {
+                    if (task?.MouseActions == null) continue;
+                    foreach (var action in task.MouseActions)
+                    {
+                        if (action?.ActionType == ActionType.ClickNearestToCenterColBox)
+                        {
+                            action.PointX = 0;
+                            action.PointY = 0;
+                            action.RcPtX = 0;
+                            action.RcPtY = 0;
+                        }
+                    }
+                }
             }
         }
         private static AppModel GetBaseEmptyModel()

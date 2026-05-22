@@ -17,5 +17,6 @@
         WaitForCondition,
         FindGreens,
         ClosestToCoordinates,
+        ClickGreenIfStatusRed,
     }
 }

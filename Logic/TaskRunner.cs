@@ -329,12 +329,7 @@ namespace BetterClicker.Logic
                 case ActionType.ClickRedBox:
                 case ActionType.ClickGreenBox:
                     var swa = Stopwatch.StartNew();
-                    Models.Point overrideCenter = null;
-                    if (task.ActionType == ActionType.ClickNearestToCenterColBox && task.PointX != 0)
-                    {
-                        overrideCenter = new Point(task.PointX, task.PointY);
-                    }
-                    var colourPoint = ImageProcessor.GetColouredBoxPoint(task.ActionType, overrideCenter);
+                    var colourPoint = ImageProcessor.GetColouredBoxPoint(task.ActionType);
                     if (colourPoint.X == 0)
                     {
                         colourPoint = GetPoint(task);
@@ -355,13 +350,13 @@ namespace BetterClicker.Logic
                     break;
                 case ActionType.QuickGreenBox:
                     var swat = Stopwatch.StartNew();
-                    var colourPointFast = ImageProcessor.GetColouredBoxPoint(task.ActionType);
-                    if (colourPointFast.X == 0)
+                    var colourPointFast = ImageProcessor.GetGreenClosestToCenterGreenBlob();
+                    if (colourPointFast.Point.X == 0)
                     {
-                        colourPointFast = GetPoint(task);
+                        colourPointFast.Point = GetPoint(task);
                     }
 
-                    MouseActions.DoLeftClick(colourPointFast);
+                    MouseActions.DoLeftClick(colourPointFast.Point);
                     swat.Stop();
                     OnInfoChanged("ClickGreenBoxTime: " + swat.ElapsedMilliseconds, new InfoChangedEventArgs() { GreenBoxTimeMessage = "ClickGreenBoxTime: " + sw.ElapsedMilliseconds });
                     break;
@@ -370,6 +365,29 @@ namespace BetterClicker.Logic
                     if (closestPoint.X != 0)
                     {
                         MouseActions.DoLeftClick(closestPoint);
+                    }
+                    break;
+                case ActionType.ClickGreenIfStatusRed:
+                    var statusTopLeft = MainWindow.AppModel.Settings.StatusCheckLeftTop;
+                    var statusBottomRight = MainWindow.AppModel.Settings.StatusCheckRightBottom;
+                    if (statusTopLeft == null || statusBottomRight == null)
+                    {
+                        OnInfoChanged("StatusCheck area not configured. Set StatusCheckLeftTop and StatusCheckRightBottom in Settings.", new EventArgs());
+                        break;
+                    }
+                    var statusHasGreen = ImageProcessor.HasColorInRegion(statusTopLeft, statusBottomRight, searchGreen: true);
+                    if (!statusHasGreen)
+                    {
+                        OnInfoChanged("Status no green detected - clicking green box", new EventArgs());
+                        var orePoint = ImageProcessor.GetColouredBoxPoint(ActionType.ClickNearestToCenterColBox);
+                        if (orePoint.X != 0)
+                        {
+                            MouseActions.DoLeftClick(orePoint);
+                        }
+                    }
+                    else
+                    {
+                        OnInfoChanged("Status has green - skipping", new EventArgs());
                     }
                     break;
                 case ActionType.WaitForCondition:

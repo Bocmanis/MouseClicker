@@ -17,6 +17,7 @@ using BetterClicker.Models;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.IO;
+using System.Xml.Linq;
 
 namespace BetterClicker.Logic
 {
@@ -41,10 +42,10 @@ namespace BetterClicker.Logic
             this.Random = new Random(DateTime.Now.Millisecond);
         }
 
-        public Models.Point GetColouredBoxPoint(ActionType actionType, Models.Point overrideCenter = null)
+        public Models.Point GetColouredBoxPoint(ActionType actionType)
         {
             // locating objects
-            var centerPoint = FindBlobs(actionType, overrideCenter);
+            var centerPoint = FindBlobs(actionType);
             return centerPoint;
         }
 
@@ -72,11 +73,12 @@ namespace BetterClicker.Logic
             using (Graphics g = Graphics.FromImage(bmp))
             {
                 g.CopyFromScreen(field.Left, field.Top, 0, 0, field.Size, CopyPixelOperation.SourceCopy);
+                SaveImage(bmp, $"TinyUnprocessed.png");
                 return bmp;
             }
         }
 
-        public Models.Point FindBlobs(ActionType actionType, Models.Point overrideCenter = null)
+        public Models.Point FindBlobs(ActionType actionType)
         {
             switch (actionType)
             {
@@ -116,28 +118,14 @@ namespace BetterClicker.Logic
                     g.DrawRectangle(new Pen(Color.Red, 3.0f), redBlob.Rectangle);
                 }
                 SaveImage(newImage, "RedResultMarked.png");
-                if (Settings.AgilityMode)
-                {
-                    if (redBlobs.Length == 2)
-                    {
-                        var rectanlge = GetConditionRectangle(Settings.ConditionLeftTop, Settings.ConditionRightBottom);
-                        var conditionArea = rectanlge.Width * rectanlge.Height;
-                        var smallBlob = redBlobs.Where(x => x.Area < conditionArea).OrderByDescending(x => x.Area).FirstOrDefault();
-                        if (smallBlob == null)
-                        {
-                            smallBlob = redBlobs.FirstOrDefault();
-                        }
-                        var point = GetPointFromEdgeToCenter(blobCounter, smallBlob, true);
-                        MouseActions.DoLeftClick(point);
-                        return GetColouredBoxPoint(actionType);
-                    }
-                }
                 if (redBlobs.Length > 1)
                 {
-                    var centerPoint = new AForge.Point(Settings.ScreenCenter.X, Settings.ScreenCenter.Y);
-                    var closestBlob = redBlobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
-                    var point = GetPointFromEdgeToCenter(blobCounter, closestBlob, true);
-                    return point;
+                    var closestBlob = GetClosestToCenterBlobBlob(redBlobs);
+                    if (closestBlob == null)
+                    {
+                        return new Models.Point(0, 0);
+                    }
+                    return GetPointFromEdgeToCenter(blobCounter, closestBlob, true);
                 }
                 if (redBlobs.Length != 0)
                 {
@@ -158,7 +146,7 @@ namespace BetterClicker.Logic
                 case ActionType.ClickBiggestColBox:
                     return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
                 case ActionType.ClickNearestToCenterColBox:
-                    return GetClosestToCenterBlob(image, blobCounter, blobs, overrideCenter);
+                    return GetClosestToCenterBlob(image, blobCounter, blobs);
                 default:
                     return GetBiggestBlobRandomMedianFromCenterToEdge(image, blobCounter, blobs);
             }
@@ -346,9 +334,9 @@ namespace BetterClicker.Logic
             }
             return new Models.Point(0, 0);
         }
-        private Models.Point GetClosestToCenterBlob(Bitmap image, BlobCounter blobCounter, Blob[] blobs, Models.Point overrideCenter = null)
+        private Models.Point GetClosestToCenterBlob(Bitmap image, BlobCounter blobCounter, Blob[] blobs)
         {
-            Blob closestBlob = GetClosestToCenterBlobBlob(blobs, overrideCenter);
+            Blob closestBlob = GetClosestToCenterBlobBlob(blobs);
             if (closestBlob != null)
             {
                 return GetPointFromEdgeToCenter(blobCounter, closestBlob);
@@ -356,11 +344,13 @@ namespace BetterClicker.Logic
             return new Models.Point(0, 0);
         }
 
-        private Blob GetClosestToCenterBlobBlob(Blob[] blobs, Models.Point overrideCenter = null)
+        private Blob GetClosestToCenterBlobBlob(Blob[] blobs)
         {
-            var center = overrideCenter != null && overrideCenter.X != 0
-                ? overrideCenter
-                : Settings.ScreenCenter;
+            var center = Settings.ScreenCenter;
+            if (center == null)
+            {
+                return null;
+            }
             var centerPoint = new AForge.Point(center.X, center.Y);
             var closestBlob = blobs.OrderBy(x => x.CenterOfGravity.DistanceTo(centerPoint)).FirstOrDefault();
             return closestBlob;
